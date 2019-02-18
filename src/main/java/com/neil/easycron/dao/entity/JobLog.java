@@ -27,14 +27,14 @@ public class JobLog implements Serializable {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "job_id")
+    @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 
-    @Column(name = "during")
+    @Column(name = "during", nullable = false)
     private Long during;
 
     @ManyToOne
-    @JoinColumn(name = "status")
+    @JoinColumn(name = "status", nullable = false)
     private ListBox status;
 
     @Column(name = "resolved")
@@ -45,10 +45,10 @@ public class JobLog implements Serializable {
     private String message;
 
     @ManyToOne
-    @JoinColumn(name = "entry_id")
+    @JoinColumn(name = "entry_id", nullable = false)
     private User entryUser;
 
-    @Column(name = "entry_datetime")
+    @Column(name = "entry_datetime", nullable = false)
     private Calendar entryDatetime;
 
     public Long getId() {

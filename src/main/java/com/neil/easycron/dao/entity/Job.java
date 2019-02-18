@@ -19,38 +19,45 @@ import javax.persistence.Table;
            @Index(columnList = "expression", name = "job_I2"),
            @Index(columnList = "status", name = "job_I3"),
            @Index(columnList = "entry_id", name = "job_I4")
-})
+       })
 public class Job implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "plugin_id")
+    @JoinColumn(name = "plugin_id", nullable = false)
     private Plugin plugin;
 
-    @Column(name = "name", length = 100)
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Column(name = "position", length = 1024)
+    @Column(name = "position", length = 1024, nullable = false)
     private String position;
 
-    @Column(name = "expression", length = 100)
+    @Column(name = "expression", length = 100, nullable = false)
     private String expression;
 
-    @Column(name = "running_count")
-    private Long runningCount;
+    @Column(name = "running_count", nullable = false)
+    private Long runningCount = 0L;
 
     @ManyToOne
-    @JoinColumn(name = "status")
+    @JoinColumn(name = "status", nullable = false)
     private ListBox status;
 
     @ManyToOne
-    @JoinColumn(name = "entry_id")
+    @JoinColumn(name = "entry_id", nullable = false)
     private User entryUser;
 
-    @Column(name = "entry_datetime")
+    @Column(name = "entry_datetime", nullable = false)
     private Calendar entryDatetime;
+
+    @ManyToOne
+    @JoinColumn(name = "update_id")
+    private User updateUser;
+
+    @Column(name = "update_datetime")
+    private Calendar updateDatetime;
 
     public Integer getId() {
         return id;
@@ -122,5 +129,21 @@ public class Job implements Serializable {
 
     public void setEntryDatetime(Calendar entryDatetime) {
         this.entryDatetime = entryDatetime;
+    }
+
+    public User getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(User updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    public Calendar getUpdateDatetime() {
+        return updateDatetime;
+    }
+
+    public void setUpdateDatetime(Calendar updateDatetime) {
+        this.updateDatetime = updateDatetime;
     }
 }

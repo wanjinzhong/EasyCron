@@ -1,0 +1,83 @@
+<Inital version="0.0.1-SNAPSHOT">
+    <Table name="ListBox">
+        <!--Job Status-->
+        <Data>
+            <Field name="catalog">JOB_STATUS</Field>
+            <Field name="code">RUNNING</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName"></Field>
+            <Field name="seq">1</Field>
+        </Data>
+        <Data>
+            <Field name="catalog">JOB_STATUS</Field>
+            <Field name="code">STOPPED</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName"></Field>
+            <Field name="seq">2</Field>
+        </Data>
+        <Data>
+            <Field name="catalog">JOB_STATUS</Field>
+            <Field name="code">CONFIG_ERROR</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName"></Field>
+            <Field name="seq">3</Field>
+        </Data>
+        <!--Job Running Status-->
+        <Data>
+            <Field name="catalog">JOB_RUNNING_STATUS</Field>
+            <Field name="code">SUCCEED</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName"></Field>
+            <Field name="seq">1</Field>
+        </Data>
+        <Data>
+            <Field name="catalog">JOB_RUNNING_STATUS</Field>
+            <Field name="code">FAILED</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName"></Field>
+            <Field name="seq">2</Field>
+        </Data>
+        <Data>
+            <Field name="catalog">JOB_RUNNING_STATUS</Field>
+            <Field name="code">WARNED</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName"></Field>
+            <Field name="seq">3</Field>
+        </Data>
+    </Table>
+
+    <Table name="Role">
+        <Data>
+            <Field name="name">CRON_EDITOR</Field>
+            <Field name="permissions">cron:add,cron:update,cron:delete,cron:test</Field>
+        </Data>
+        <Data>
+            <Field name="name">CRON_OPERATOR</Field>
+            <Field name="permissions">cron:run,cron:stop</Field>
+        </Data>
+        <Data>
+            <Field name="name">USER_MANAGER</Field>
+            <Field name="permissions">user:add,user:dismiss,user:assign</Field>
+        </Data>
+        <Data>
+            <Field name="name">PLUGIN_OPERATOR</Field>
+            <Field name="permissions">plugin:install,plugin:uninstall</Field>
+        </Data>
+        <Data>
+            <Field name="name">PLUGIN_DEVELOPER</Field>
+            <Field name="permissions">plugin:upload</Field>
+        </Data>
+        <Data>
+            <Field name="name">PLUGIN_PUSHER</Field>
+            <Field name="permissions">plugin:push</Field>
+        </Data>
+    </Table>
+    <Table name="User">
+        <Data>
+            <Field name="id">1</Field>
+            <Field name="name">SYSTEM</Field>
+            <Field name="email">1051750377@qq.com</Field>
+            <Field name="avatar"></Field>
+        </Data>
+    </Table>
+</Inital>

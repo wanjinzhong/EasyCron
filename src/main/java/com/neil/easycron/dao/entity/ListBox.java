@@ -23,14 +23,14 @@ public class ListBox implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "list_catalog", length = 50)
+    @Column(name = "list_catalog", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
     private ListCatalog catalog;
 
-    @Column(name = "code", length = 50)
+    @Column(name = "code", length = 50, nullable = false)
     private String code;
 
-    @Column(name = "seq")
+    @Column(name = "seq", nullable = false)
     private Integer seq;
 
     @Column(name = "display_name", length = 100)

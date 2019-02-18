@@ -24,19 +24,19 @@ public class Plugin implements Serializable {
     @Column(name = "global_id")
     private Long pluginId;
 
-    @Column(name = "name", nullable = true, length = 100)
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Column(name = "group_id", length = 200)
+    @Column(name = "group_id", length = 200, nullable = false)
     private String groupId;
 
-    @Column(name = "artifact_id", length = 100)
+    @Column(name = "artifact_id", length = 100, nullable = false)
     private String artifactId;
 
     @Column(name = "thumb_url", length = 1024)
     private String thumbUrl;
 
-    @Column(name = "version", length = 20)
+    @Column(name = "version", length = 20, nullable = false)
     private String version;
 
     public Integer getId() {

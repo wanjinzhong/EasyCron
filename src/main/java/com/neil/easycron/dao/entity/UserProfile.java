@@ -28,10 +28,10 @@ public class UserProfile implements Serializable {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "profile_key")
+    @JoinColumn(name = "profile_key", nullable = false)
     private ListBox key;
 
-    @Column(name = "profile_value")
+    @Column(name = "profile_value", nullable = false)
     private String value;
 
     public Integer getId() {

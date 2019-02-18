@@ -9,7 +9,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -17,9 +16,9 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "user", indexes = {@Index(columnList = "email", name = "user_I1")},
-       uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "user_I2")})
-public class User implements Serializable {
+@Table(name = "role", uniqueConstraints = {@UniqueConstraint(columnNames = "name", name = "role_I1")})
+public class Role implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -27,17 +26,14 @@ public class User implements Serializable {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    @Column(name = "email", length = 100, nullable = false)
-    private String email;
-
-    @Column(name = "avatar", length = 200)
-    private String avatar;
+    @Column(name = "permissions", nullable = false)
+    private String permissions;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_role",
-               joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-               inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private List<Role> roles;
+               joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")},
+               inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
+    private List<User> users;
 
     public Integer getId() {
         return id;
@@ -55,27 +51,19 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getPermissions() {
+        return permissions;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPermissions(String permissions) {
+        this.permissions = permissions;
     }
 
-    public String getAvatar() {
-        return avatar;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

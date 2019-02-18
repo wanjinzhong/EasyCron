@@ -18,10 +18,10 @@ public class Security implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "password", length = 50)
+    @Column(name = "password", length = 50, nullable = false)
     private String password;
 
-    @Column(name = "salt", length = 20)
+    @Column(name = "salt", length = 20, nullable = false)
     private String salt;
 
     @Column(name = "update_datetime")

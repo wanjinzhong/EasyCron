@@ -19,4 +19,4 @@ fi
 echo 'Build new image'
 docker build -q -t easy-cron .
 echo 'Run image'
-docker run -p 8088:8080 --name easy-cron -v /var/webapps/logs/easy-cron/:/var/logs/easy-cron easy-cron:latest
+docker run -d -p 8088:8080 --name easy-cron -v /var/webapps/logs/easy-cron/:/var/logs/easy-cron easy-cron:latest
