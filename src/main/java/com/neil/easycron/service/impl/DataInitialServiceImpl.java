@@ -1,9 +1,8 @@
 package com.neil.easycron.service.impl;
-import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -42,7 +41,7 @@ public class DataInitialServiceImpl implements DataInitialService {
         List<ListBox> listBoxes = new ArrayList<>();
         List<Role> roles = new ArrayList<>();
         List<User> users = new ArrayList<>();
-        readInitialData(listBoxes, roles, users, new ClassPathResource("initial_data.xml").getFile());
+        readInitialData(listBoxes, roles, users, new ClassPathResource("initial_data.xml").getInputStream());
         initListBox(listBoxes);
         initRole(roles);
         initUser(users);
@@ -85,10 +84,10 @@ public class DataInitialServiceImpl implements DataInitialService {
         }
     }
 
-    private void readInitialData(List<ListBox> listBoxes, List<Role> roles, List<User> users, File file)
+    private void readInitialData(List<ListBox> listBoxes, List<Role> roles, List<User> users, InputStream inputStream)
         throws DocumentException, NoSuchFieldException, IllegalAccessException {
         SAXReader saxReader = new SAXReader();
-        Document document = saxReader.read(file);
+        Document document = saxReader.read(inputStream);
         Element root = document.getRootElement();
         for (Element table : root.elements()) {
             String tableName = table.attributeValue("name");
