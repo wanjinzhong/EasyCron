@@ -35,8 +35,14 @@ public class Job implements Serializable {
     @Column(name = "position", length = 1024, nullable = false)
     private String position;
 
-    @Column(name = "expression", length = 100, nullable = false)
+    @Column(name = "expression", length = 100)
     private String expression;
+
+    @Column(name = "description", length = 1024)
+    private String desc;
+
+    @Column(name = "config_file_name")
+    private String configFileName;
 
     @Column(name = "running_count", nullable = false)
     private Long runningCount = 0L;
@@ -145,5 +151,21 @@ public class Job implements Serializable {
 
     public void setUpdateDatetime(Calendar updateDatetime) {
         this.updateDatetime = updateDatetime;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getConfigFileName() {
+        return configFileName;
+    }
+
+    public void setConfigFileName(String configFileName) {
+        this.configFileName = configFileName;
     }
 }

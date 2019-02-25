@@ -22,6 +22,13 @@
             <Field name="displayName"></Field>
             <Field name="seq">3</Field>
         </Data>
+        <Data>
+            <Field name="catalog">JOB_STATUS</Field>
+            <Field name="code">WAITING_CONFIG</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName"></Field>
+            <Field name="seq">4</Field>
+        </Data>
         <!--Job Running Status-->
         <Data>
             <Field name="catalog">JOB_RUNNING_STATUS</Field>
@@ -78,6 +85,8 @@
             <Field name="name">SYSTEM</Field>
             <Field name="email">1051750377@qq.com</Field>
             <Field name="avatar"></Field>
+            <Field name="password">auto</Field>
+            <Field name="salt">auto</Field>
         </Data>
     </Table>
 </Inital>

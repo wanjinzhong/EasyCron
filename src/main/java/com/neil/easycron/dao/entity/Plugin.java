@@ -27,11 +27,20 @@ public class Plugin implements Serializable {
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
+    @Column(name = "description", length = 1024)
+    private String description;
+
     @Column(name = "group_id", length = 200, nullable = false)
     private String groupId;
 
     @Column(name = "artifact_id", length = 100, nullable = false)
     private String artifactId;
+
+    @Column(name = "main_class", length = 512, nullable = false)
+    private String mainClass;
+
+    @Column(name = "package_location", length = 512, nullable = false)
+    private String packageLocation;
 
     @Column(name = "thumb_url", length = 1024)
     private String thumbUrl;
@@ -79,6 +88,22 @@ public class Plugin implements Serializable {
         this.artifactId = artifactId;
     }
 
+    public String getMainClass() {
+        return mainClass;
+    }
+
+    public void setMainClass(String mainClass) {
+        this.mainClass = mainClass;
+    }
+
+    public String getPackageLocation() {
+        return packageLocation;
+    }
+
+    public void setPackageLocation(String packageLocation) {
+        this.packageLocation = packageLocation;
+    }
+
     public String getThumbUrl() {
         return thumbUrl;
     }
@@ -93,5 +118,13 @@ public class Plugin implements Serializable {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

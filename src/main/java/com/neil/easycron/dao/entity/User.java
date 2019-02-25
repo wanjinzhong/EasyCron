@@ -9,7 +9,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -17,7 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "user", indexes = {@Index(columnList = "email", name = "user_I1")},
+@Table(name = "user",
        uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "user_I2")})
 public class User implements Serializable {
     @Id
@@ -38,6 +37,12 @@ public class User implements Serializable {
                joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
                inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
     private List<Role> roles;
+
+    @Column(name = "password", length = 50, nullable = false)
+    private String password;
+
+    @Column(name = "salt", length = 20, nullable = false)
+    private String salt;
 
     public Integer getId() {
         return id;
@@ -77,5 +82,21 @@ public class User implements Serializable {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

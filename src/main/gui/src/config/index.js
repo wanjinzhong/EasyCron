@@ -18,7 +18,7 @@ export default {
    */
   baseUrl: {
     // dev: 'https://www.easy-mock.com/mock/5add9213ce4d0e69998a6f51/iview-admin/',
-    dev: 'http://localhost:8080/easycron/public/api',
+    dev: 'http://localhost:8089/easycron/public/api',
     pro: '/easycron/public/api'
   },
   /**

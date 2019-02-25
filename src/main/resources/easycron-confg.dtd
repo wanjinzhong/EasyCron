@@ -1,0 +1,10 @@
+<!ELEMENT Config (Group|Item)+>
+<!ELEMENT Group (Item)+>
+<!ELEMENT Item (Option|#PCDATA)+>
+<!ELEMENT Option (#PCDATA)>
+<!ATTLIST Group name CDATA #REQUIRED>
+<!ATTLIST Group seq CDATA #REQUIRED>
+<!ATTLIST Item name CDATA #REQUIRED>
+<!ATTLIST Item ID CDATA #REQUIRED>
+<!ATTLIST Item seq CDATA #REQUIRED>
+<!ATTLIST Item type (string|text|bool|multiple) "straing" #REQUIRED>
