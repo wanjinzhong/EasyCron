@@ -85,8 +85,8 @@
             <Field name="name">SYSTEM</Field>
             <Field name="email">1051750377@qq.com</Field>
             <Field name="avatar"></Field>
-            <Field name="password">auto</Field>
-            <Field name="salt">auto</Field>
+            <Field name="password">None</Field>
+            <Field name="salt">None</Field>
         </Data>
     </Table>
 </Inital>

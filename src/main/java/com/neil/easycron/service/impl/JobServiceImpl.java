@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import com.neil.easycron.bo.NewJobBo;
 import com.neil.easycron.bo.config.ConfigFileBo;
@@ -30,7 +31,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,7 +114,7 @@ public class JobServiceImpl implements JobService {
     public ConfigFileBo getConfigs(Integer jobId) {
         Job job = jobRepository.findById(jobId).orElse(null);
         if (job == null) {
-            throw new BizException("任务名称不存在");
+            throw new BizException("任务不存在");
         }
         File configFile = new File(job.getPosition() + "/" + job.getConfigFileName());
         if (!configFile.exists()) {
@@ -129,19 +132,36 @@ public class JobServiceImpl implements JobService {
         List<ConfigItemBo> itemBos = new ArrayList<>();
         Element root = document.getRootElement();
         for (Element element : root.elements()) {
-            if ("Group".equals(element.getName())) {
-                ConfigGroupBo groupBo = new ConfigGroupBo();
-                groupBo.setGroupName(element.attributeValue("name"));
-                if (StringUtils.isNotBlank(element.attributeValue("seq"))) {
-                    groupBo.setSeq(Integer.valueOf(element.attributeValue("seq")));
-                }
-                for (Element item : element.elements()) {
-                    groupBo.getItems().add(getConfigItem(item));
-                }
-                groupBo.getItems().sort(Comparator.comparing(ConfigItemBo::getSeq));
-                groupBos.add(groupBo);
-            } else {
-                itemBos.add(getConfigItem(element));
+            switch (element.getName()) {
+                case "Group":
+                    ConfigGroupBo groupBo = new ConfigGroupBo();
+                    groupBo.setGroupName(element.attributeValue("name"));
+                    if (StringUtils.isNotBlank(element.attributeValue("seq"))) {
+                        groupBo.setSeq(Integer.valueOf(element.attributeValue("seq")));
+                    }
+                    for (Element item : element.elements()) {
+                        groupBo.getItems().add(getConfigItem(item));
+                    }
+                    groupBo.getItems().sort(Comparator.comparing(ConfigItemBo::getSeq));
+                    groupBos.add(groupBo);
+                    break;
+                case "Item":
+                    itemBos.add(getConfigItem(element));
+                    break;
+                case "Items":
+                    ConfigItemBo configItemBo = new ConfigItemBo();
+                    configItemBo.setId(element.attributeValue("ID"));
+                    configItemBo.setType(ConfigItemType.multiple);
+                    configItemBo.setSeq(Integer.valueOf(element.attributeValue("seq")));
+                    configItemBo.setValue(element.attributeValue("value"));
+                    for (Element option : element.elements()) {
+                        if (!CollectionUtils.isEmpty(element.content())) {
+                            configItemBo.getOptional().put(option.attributeValue("value"), option.getText());
+                        }
+                    }
+                    itemBos.add(configItemBo);
+                default:
+                    break;
             }
         }
         groupBos.sort(Comparator.comparing(ConfigGroupBo::getSeq));
@@ -149,6 +169,56 @@ public class JobServiceImpl implements JobService {
         configs.setGroups(groupBos);
         configs.setItems(itemBos);
         return configs;
+    }
+
+    @Override
+    public void saveConfigs(Integer jobId, Map<String, Object> configData) {
+        Job job = jobRepository.findById(jobId).orElse(null);
+        if (job == null) {
+            throw new BizException("任务不存在");
+        }
+        File file = new File(job.getPosition() + "/" + job.getConfigFileName());
+        if (!file.exists()) {
+            throw new BizException("任务配置丢失");
+        }
+        EasyJobService service = JobPluginUtil.getJobService(job.getPlugin());
+        Map<String, String> errors = service.validateConfigFile(configData);
+        if (!CollectionUtils.isEmpty(errors)) {
+            StringBuilder msg = new StringBuilder();
+            for (Map.Entry<String, String> entry : errors.entrySet()) {
+                msg.append(entry.getKey()).append(": ").append(entry.getValue()).append("<br/>");
+            }
+            throw new BizException(msg.toString());
+        }
+        saveConfigFile(file, configData);
+    }
+
+    private void saveConfigFile(File file, Map<String, Object> configData) {
+        try {
+            Document document = new SAXReader().read(file);
+            Element root = document.getRootElement();
+            for (Element child : root.elements()) {
+                if ("Item".equalsIgnoreCase(child.getName())) {
+                    child.setText(getNotNullString(configData, child.attributeValue("ID")));
+                } else if ("Group".equalsIgnoreCase(child.getName())) {
+                    for (Element groupChild : child.elements()) {
+                        groupChild.setText(getNotNullString(configData, groupChild.attributeValue("ID")));
+                    }
+                } else if ("Items".equalsIgnoreCase(child.getName())) {
+                    child.addAttribute("value", getNotNullString(configData, child.attributeValue("ID")));
+                }
+            }
+            XMLWriter xmlWriter = new XMLWriter(new FileOutputStream(file), OutputFormat.createPrettyPrint());
+            xmlWriter.write(document);
+            xmlWriter.close();
+        } catch (DocumentException | IOException e) {
+            throw new BizException("无法读取配置文件");
+        }
+    }
+
+    private String getNotNullString(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        return value == null ? "" : value.toString();
     }
 
     private ConfigItemBo getConfigItem(Element element) {

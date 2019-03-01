@@ -1,12 +1,16 @@
 package com.neil.easycron.bo.config;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.neil.easycron.constant.enums.ConfigItemType;
 
 public class ConfigItemBo {
     private String id;
     private String name;
-    private Integer seq;
+    private Integer seq = 0;
     private ConfigItemType type;
     private Object value;
+    private Map<String, String> optional = new HashMap<>();
 
     public String getId() {
         return id;
@@ -46,5 +50,13 @@ public class ConfigItemBo {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public Map<String, String> getOptional() {
+        return optional;
+    }
+
+    public void setOptional(Map<String, String> optional) {
+        this.optional = optional;
     }
 }
