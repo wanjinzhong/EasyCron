@@ -2,6 +2,7 @@ package com.neil.easycron.api;
 import com.google.common.collect.Lists;
 import com.neil.easycron.bo.response.JsonEntity;
 import com.neil.easycron.bo.user.LoginRequestBo;
+import com.neil.easycron.bo.user.RegisterRequestBo;
 import com.neil.easycron.bo.user.UserInfo;
 import com.neil.easycron.service.UserService;
 import com.neil.easycron.utils.ResponseHelper;
@@ -27,6 +28,12 @@ public class UserApi {
     @PostMapping("login")
     public JsonEntity login(@RequestBody LoginRequestBo loginRequestBo) {
         userService.login(loginRequestBo);
+        return ResponseHelper.ofNothing();
+    }
+
+    @PostMapping("register")
+    public JsonEntity register(@RequestBody RegisterRequestBo registerRequestBo) {
+        userService.regist(registerRequestBo);
         return ResponseHelper.ofNothing();
     }
 

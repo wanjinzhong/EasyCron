@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.neil.easycron.bo.response.JsonEntity;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AccountException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
@@ -31,6 +32,16 @@ public class GlobalExceptionHandler {
         JsonEntity jsonEntity = new JsonEntity();
         jsonEntity.setCode(401);
         jsonEntity.setMessage(e.getMessage());
+        return jsonEntity;
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UnknownAccountException.class)
+    public JsonEntity handle401(UnknownAccountException e) {
+        logger.error("ERROR: " + e.getMessage(), e);
+        JsonEntity jsonEntity = new JsonEntity();
+        jsonEntity.setCode(401);
+        jsonEntity.setMessage("账号或密码错误");
         return jsonEntity;
     }
 
