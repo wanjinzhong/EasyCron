@@ -8,14 +8,19 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.neil.easycron.bo.NewJobBo;
+import com.neil.easycron.bo.PageResult;
 import com.neil.easycron.bo.config.ConfigFileBo;
 import com.neil.easycron.bo.config.ConfigGroupBo;
 import com.neil.easycron.bo.config.ConfigItemBo;
+import com.neil.easycron.bo.job.JobBo;
+import com.neil.easycron.bo.job.JobSearchRequest;
 import com.neil.easycron.constant.enums.ConfigItemType;
 import com.neil.easycron.constant.enums.JobStatus;
 import com.neil.easycron.constant.enums.ListCatalog;
+import com.neil.easycron.constant.enums.Role;
 import com.neil.easycron.dao.entity.Job;
 import com.neil.easycron.dao.entity.ListBox;
 import com.neil.easycron.dao.entity.Plugin;
@@ -26,8 +31,11 @@ import com.neil.easycron.dao.repository.PluginRepository;
 import com.neil.easycron.exception.BizException;
 import com.neil.easycron.plugin.service.EasyJobService;
 import com.neil.easycron.service.JobService;
+import com.neil.easycron.utils.CommonUtil;
 import com.neil.easycron.utils.JobPluginUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -35,6 +43,8 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -191,6 +201,37 @@ public class JobServiceImpl implements JobService {
             throw new BizException(msg.toString());
         }
         saveConfigFile(file, configData);
+    }
+
+    @Override
+    public PageResult<JobBo> searchJobs(JobSearchRequest request) {
+        PageRequest pageRequest = PageRequest.of(request.getPage() - 1, request.getSize());
+        String keyword = request.getKeyword();
+        if (StringUtils.isBlank(keyword)) {
+            keyword = "";
+        }
+        keyword = CommonUtil.convertMySqlParam(keyword);
+        Page<Job> jobs = jobRepository.findByNameLike("%" + keyword + "%", pageRequest);
+        return  new PageResult<>(request.getPage(), request.getSize(), jobs.getTotalPages(), jobs.getTotalElements(), jobToBos(jobs));
+    }
+
+    private List<JobBo> jobToBos(Page<Job> jobs) {
+        Subject subject = SecurityUtils.getSubject();
+        boolean editable = subject.hasRole(Role.CRON_EDITOR.name());
+        boolean operable = subject.hasRole(Role.CRON_OPERATOR.name());
+        return jobs.get().map(job -> {
+            JobBo jobBo = new JobBo();
+            jobBo.setId(job.getId());
+            jobBo.setName(job.getName());
+            jobBo.setDesc(job.getDesc());
+            jobBo.setCronReg(job.getExpression());
+            jobBo.setCronDesc(job.getExpression());
+            jobBo.setLogVisiable(true);
+            jobBo.setEditable(editable);
+            jobBo.setOperable(operable);
+            return jobBo;
+        }).collect(Collectors.toList());
+
     }
 
     private void saveConfigFile(File file, Map<String, Object> configData) {

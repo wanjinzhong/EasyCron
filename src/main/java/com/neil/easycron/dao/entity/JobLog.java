@@ -30,19 +30,22 @@ public class JobLog implements Serializable {
     @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 
-    @Column(name = "during", nullable = false)
-    private Long during;
-
     @ManyToOne
     @JoinColumn(name = "status", nullable = false)
     private ListBox status;
 
-    @Column(name = "resolved")
-    private Boolean resolved;
+    @Column(name = "resolved", length = 1)
+    private String resolved;
 
     @Column(name = "message")
     @Lob
     private String message;
+
+    @Column(name = "start_time")
+    private Calendar startTime;
+
+    @Column(name = "end_time")
+    private Calendar endTime;
 
     @ManyToOne
     @JoinColumn(name = "entry_id", nullable = false)
@@ -67,12 +70,20 @@ public class JobLog implements Serializable {
         this.job = job;
     }
 
-    public Long getDuring() {
-        return during;
+    public Calendar getStartTime() {
+        return startTime;
     }
 
-    public void setDuring(Long during) {
-        this.during = during;
+    public void setStartTime(Calendar startTime) {
+        this.startTime = startTime;
+    }
+
+    public Calendar getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Calendar endTime) {
+        this.endTime = endTime;
     }
 
     public ListBox getStatus() {
@@ -83,11 +94,11 @@ public class JobLog implements Serializable {
         this.status = status;
     }
 
-    public Boolean getResolved() {
+    public String getResolved() {
         return resolved;
     }
 
-    public void setResolved(Boolean resolved) {
+    public void setResolved(String resolved) {
         this.resolved = resolved;
     }
 
