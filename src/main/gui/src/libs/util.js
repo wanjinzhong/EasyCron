@@ -1,20 +1,4 @@
-import Cookies from 'js-cookie'
-// cookie保存的天数
-import config from '@/config'
 import { forEach, hasOneOf, objEqual } from '@/libs/tools'
-const { title, cookieExpires, useI18n } = config
-
-export const TOKEN_KEY = 'token'
-
-export const setToken = (token) => {
-  Cookies.set(TOKEN_KEY, token, { expires: cookieExpires || 1 })
-}
-
-export const getToken = () => {
-  const token = Cookies.get(TOKEN_KEY)
-  if (token) return token
-  else return false
-}
 
 export const hasChild = (item) => {
   return item.children && item.children.length !== 0
@@ -22,9 +6,14 @@ export const hasChild = (item) => {
 
 const showThisMenuEle = (item, access) => {
   if (item.meta && item.meta.access && item.meta.access.length) {
-    if (hasOneOf(item.meta.access, access)) return true
-    else return false
-  } else return true
+    if (hasOneOf(item.meta.access, access)) {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return true
+  }
 }
 /**
  * @param {Array} list 通过路由列表得到菜单列表
@@ -86,7 +75,9 @@ export const getRouteTitleHandled = (route) => {
     if (typeof meta.title === 'function') {
       meta.__titleIsFunction__ = true
       title = meta.title(router)
-    } else title = meta.title
+    } else {
+      title = meta.title
+    }
   }
   meta.title = title
   router.meta = meta
@@ -94,13 +85,9 @@ export const getRouteTitleHandled = (route) => {
 }
 
 export const showTitle = (item, vm) => {
-  let { title, __titleIsFunction__ } = item.meta
+  let { title } = item.meta
   if (!title) return
-  if (useI18n) {
-    if (title.includes('{{') && title.includes('}}') && useI18n) title = title.replace(/({{[\s\S]+?}})/, (m, str) => str.replace(/{{([\s\S]*)}}/, (m, _) => vm.$t(_.trim())))
-    else if (__titleIsFunction__) title = item.meta.title
-    else title = vm.$t(item.name)
-  } else title = (item.meta && item.meta.title) || item.name
+  title = (item.meta && item.meta.title) || item.name
   return title
 }
 
@@ -146,8 +133,11 @@ export const getHomeRoute = (routers, homeName = 'home') => {
 export const getNewTagList = (list, newRoute) => {
   const { name, path, meta } = newRoute
   let newList = [...list]
-  if (newList.findIndex(item => item.name === name) >= 0) return newList
-  else newList.push({ name, path, meta })
+  if (newList.findIndex(item => item.name === name) >= 0) {
+    return newList
+  } else {
+    newList.push({ name, path, meta })
+  }
   return newList
 }
 
@@ -156,8 +146,11 @@ export const getNewTagList = (list, newRoute) => {
  * @param {*} route 路由列表
  */
 const hasAccess = (access, route) => {
-  if (route.meta && route.meta.access) return hasOneOf(access, route.meta.access)
-  else return true
+  if (route.meta && route.meta.access) {
+    return hasOneOf(access, route.meta.access)
+  } else {
+    return true
+  }
 }
 
 /**
@@ -205,8 +198,11 @@ export const getNextRoute = (list, route) => {
     res = getHomeRoute(list)
   } else {
     const index = list.findIndex(item => routeEqual(item, route))
-    if (index === list.length - 1) res = list[list.length - 2]
-    else res = list[index + 1]
+    if (index === list.length - 1) {
+      res = list[list.length - 2]
+    } else {
+      res = list[index + 1]
+    }
   }
   return res
 }
@@ -242,8 +238,11 @@ export const getArrayFromFile = (file) => {
       }).map(item => {
         return item[0].split(',')
       })
-      if (format === 'csv') resolve(arr)
-      else reject(new Error('[Format Error]:你上传的不是Csv文件'))
+      if (format === 'csv') {
+        resolve(arr)
+      } else {
+        reject(new Error('[Format Error]:你上传的不是Csv文件'))
+      }
     }
   })
 }
@@ -307,8 +306,11 @@ export const findNodeDownward = (ele, tag) => {
     let len = ele.childNodes.length
     while (++i < len) {
       let child = ele.childNodes[i]
-      if (child.tagName === tagName) return child
-      else return findNodeDownward(child, tag)
+      if (child.tagName === tagName) {
+        return child
+      } else {
+        return findNodeDownward(child, tag)
+      }
     }
   }
 }
@@ -394,6 +396,7 @@ export const scrollTop = (el, from = 0, to, duration = 500, endCallback) => {
 export const setTitle = (routeItem, vm) => {
   const handledRoute = getRouteTitleHandled(routeItem)
   const pageTitle = showTitle(handledRoute, vm)
-  const resTitle = pageTitle ? `${title} - ${pageTitle}` : title
+  // const resTitle = pageTitle ? `${title} - ${pageTitle}` : title
+  const resTitle = ``
   window.document.title = resTitle
 }

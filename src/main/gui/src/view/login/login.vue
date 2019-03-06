@@ -17,6 +17,7 @@
 <script>
 import LoginForm from '_c/login-form'
 import { mapActions } from 'vuex'
+
 export default {
   components: {
     LoginForm
@@ -27,11 +28,10 @@ export default {
       'getUserInfo'
     ]),
     handleSubmit ({ email, password }) {
-      this.handleLogin({ email, password }).then(res => {
-        this.getUserInfo().then(res => {
-          this.$router.push({
-            name: this.$config.homeName
-          })
+      this.axios.post('login', { email, password }).then(res => {
+        window.localStorage.setItem('USER', email)
+        this.$router.push({
+          name: this.$config.homeName
         })
       })
     }
