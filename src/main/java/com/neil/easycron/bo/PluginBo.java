@@ -6,6 +6,8 @@ public class PluginBo {
 
     private String desc;
 
+    private Long picture;
+
     public Integer getId() {
         return id;
     }
@@ -28,5 +30,13 @@ public class PluginBo {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public Long getPicture() {
+        return picture;
+    }
+
+    public void setPicture(Long picture) {
+        this.picture = picture;
     }
 }

@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -42,8 +44,9 @@ public class Plugin implements Serializable {
     @Column(name = "package_location", length = 512, nullable = false)
     private String packageLocation;
 
-    @Column(name = "thumb_url", length = 1024)
-    private String thumbUrl;
+    @ManyToOne
+    @JoinColumn(name = "picture")
+    private Resource picture;
 
     @Column(name = "version", length = 20, nullable = false)
     private String version;
@@ -104,12 +107,12 @@ public class Plugin implements Serializable {
         this.packageLocation = packageLocation;
     }
 
-    public String getThumbUrl() {
-        return thumbUrl;
+    public Resource getPicture() {
+        return picture;
     }
 
-    public void setThumbUrl(String thumbUrl) {
-        this.thumbUrl = thumbUrl;
+    public void setPicture(Resource picture) {
+        this.picture = picture;
     }
 
     public String getVersion() {

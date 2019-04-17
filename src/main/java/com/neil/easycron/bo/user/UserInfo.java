@@ -1,41 +1,27 @@
 package com.neil.easycron.bo.user;
 import java.util.List;
 
-public class UserInfo {
-    private String avatar;
-    private String name;
-    private String email;
-    private List<String> access;
+import com.neil.easycron.bo.role.BasicRoleBo;
 
-    public String getAvatar() {
-        return avatar;
+public class UserInfo extends BasicUserBo{
+
+    private boolean roleAddable;
+
+    private List<BasicRoleBo> roles;
+
+    public boolean isRoleAddable() {
+        return roleAddable;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public void setRoleAddable(boolean roleAddable) {
+        this.roleAddable = roleAddable;
     }
 
-    public String getName() {
-        return name;
+    public List<BasicRoleBo> getRoles() {
+        return roles;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public List<String> getAccess() {
-        return access;
-    }
-
-    public void setAccess(List<String> access) {
-        this.access = access;
+    public void setRoles(List<BasicRoleBo> roles) {
+        this.roles = roles;
     }
 }

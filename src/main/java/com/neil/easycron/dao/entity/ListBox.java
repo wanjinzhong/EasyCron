@@ -16,7 +16,8 @@ import com.neil.easycron.constant.enums.ListCatalog;
 
 @Entity
 @Table(name = "list_box",
-       uniqueConstraints = {@UniqueConstraint(columnNames = {"list_catalog", "code", "seq"})})
+       uniqueConstraints = {@UniqueConstraint(columnNames = {"list_catalog", "seq"}),
+           @UniqueConstraint(columnNames = {"list_catalog", "code"})})
 public class ListBox implements Serializable {
 
     @Id

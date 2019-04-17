@@ -2,6 +2,7 @@ package com.neil.easycron.bo;
 public class NewJobBo {
     private Integer pluginId;
     private String name;
+    private String cron;
     private String desc;
 
     public Integer getPluginId() {
@@ -26,5 +27,13 @@ public class NewJobBo {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
     }
 }

@@ -6,15 +6,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.security.auth.login.AccountLockedException;
+
 import com.google.common.collect.Sets;
 import com.neil.easycron.config.EasyCronToken;
+import com.neil.easycron.constant.enums.UserStatus;
 import com.neil.easycron.dao.entity.Role;
 import com.neil.easycron.dao.entity.User;
 import com.neil.easycron.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -35,10 +40,13 @@ public class EasyCronRealm extends AuthorizingRealm {
         String email = (String) SecurityUtils.getSubject().getPrincipal();
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         User user = userService.findByEmail(email);
-        info.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+        validateUser(user);
+        info.setRoles(user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()));
         Set<String> permissions = new HashSet<>();
         user.getRoles().forEach(role -> {
-            permissions.addAll(Sets.newHashSet(role.getPermissions().split(",")));
+            if (StringUtils.isNotBlank(role.getPermissions())) {
+                permissions.addAll(Sets.newHashSet(role.getPermissions().split(",")));
+            }
         });
         info.setStringPermissions(permissions);
         return info;
@@ -49,8 +57,15 @@ public class EasyCronRealm extends AuthorizingRealm {
         EasyCronToken token = (EasyCronToken) authenticationToken;
         String email = (String) token.getPrincipal();
         User user = userService.findByEmail(email);
+        validateUser(user);
+        return new SimpleAuthenticationInfo(user.getEmail(), user.getPassword(), ByteSource.Util.bytes(user.getSalt()), getName());
+    }
+
+    private void validateUser(User user) {
         if (user != null) {
-            return new SimpleAuthenticationInfo(user.getEmail(), user.getPassword(), ByteSource.Util.bytes(user.getSalt()), getName());
+            if (UserStatus.DISABLED.equals(user.getStatus().getCode())) {
+                throw new DisabledAccountException("账户已被禁用");
+            }
         } else {
             throw new UnknownAccountException();
         }

@@ -1,13 +1,19 @@
 package com.neil.easycron.bo.job;
+import com.neil.easycron.constant.enums.JobStatus;
+
 public class JobBo {
     private Integer id;
     private String name;
     private String desc;
     private String cronReg;
     private String cronDesc;
+    private Long count;
     private boolean operable = false;
     private boolean editable = false;
     private boolean logVisiable = false;
+    private Long pluginPicId;
+    private String plugin;
+    private JobStatus status;
 
     public Integer getId() {
         return id;
@@ -71,5 +77,37 @@ public class JobBo {
 
     public void setLogVisiable(boolean logVisiable) {
         this.logVisiable = logVisiable;
+    }
+
+    public JobStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(JobStatus status) {
+        this.status = status;
+    }
+
+    public String getPlugin() {
+        return plugin;
+    }
+
+    public void setPlugin(String plugin) {
+        this.plugin = plugin;
+    }
+
+    public Long getCount() {
+        return count;
+    }
+
+    public void setCount(Long count) {
+        this.count = count;
+    }
+
+    public Long getPluginPicId() {
+        return pluginPicId;
+    }
+
+    public void setPluginPicId(Long pluginPicId) {
+        this.pluginPicId = pluginPicId;
     }
 }

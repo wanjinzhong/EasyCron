@@ -1,6 +1,6 @@
 package com.neil.easycron.bo.config;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.neil.easycron.constant.enums.ConfigItemType;
 
@@ -10,7 +10,9 @@ public class ConfigItemBo {
     private Integer seq = 0;
     private ConfigItemType type;
     private Object value;
-    private Map<String, String> optional = new HashMap<>();
+    private Double max;
+    private Double min;
+    private List<ConfigOption> optional = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -52,11 +54,27 @@ public class ConfigItemBo {
         this.value = value;
     }
 
-    public Map<String, String> getOptional() {
+    public List<ConfigOption> getOptional() {
         return optional;
     }
 
-    public void setOptional(Map<String, String> optional) {
+    public void setOptional(List<ConfigOption> optional) {
         this.optional = optional;
+    }
+
+    public Double getMax() {
+        return max;
+    }
+
+    public void setMax(Double max) {
+        this.max = max;
+    }
+
+    public Double getMin() {
+        return min;
+    }
+
+    public void setMin(Double min) {
+        this.min = min;
     }
 }

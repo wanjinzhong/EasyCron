@@ -1,23 +1,31 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
-import user from './module/user'
-import app from './module/app'
+import app from './modules/app'
+import errorLog from './modules/errorLog'
+import permission from './modules/permission'
+import tagsView from './modules/tagsView'
+import user from './modules/user'
+import job from './modules/job'
+import listbox from './modules/listbox'
+import plugin from './modules/plugin'
+import role from './modules/role'
+import getters from './getters'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {
-    //
-  },
-  mutations: {
-    //
-  },
-  actions: {
-    //
-  },
+const store = new Vuex.Store({
   modules: {
+    app,
+    errorLog,
+    permission,
+    tagsView,
     user,
-    app
-  }
+    job,
+    listbox,
+    plugin,
+    role
+  },
+  getters
 })
+
+export default store

@@ -4,19 +4,20 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import com.neil.easycron.constant.enums.ProfileKey;
 
 @Entity
-@Table(name = "user_profile", indexes = {
-    @Index(columnList = "user_id", name = "user_profile_I1"),
-    @Index(columnList = "profile_key", name = "user_profile_I2")
-})
+@Table(name = "user_profile", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "profile_key"}, name = "user_profile_I1")})
 public class UserProfile implements Serializable {
 
     @Id
@@ -27,9 +28,9 @@ public class UserProfile implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "profile_key", nullable = false)
-    private ListBox key;
+    @Column(name = "profile_key", length = 100, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProfileKey key;
 
     @Column(name = "profile_value", nullable = false)
     private String value;
@@ -50,11 +51,11 @@ public class UserProfile implements Serializable {
         this.user = user;
     }
 
-    public ListBox getKey() {
+    public ProfileKey getKey() {
         return key;
     }
 
-    public void setKey(ListBox key) {
+    public void setKey(ProfileKey key) {
         this.key = key;
     }
 

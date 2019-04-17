@@ -1,10 +1,12 @@
 package com.neil.easycron.api;
 
+import java.util.List;
 import java.util.Map;
 
 import com.neil.easycron.bo.NewJobBo;
 import com.neil.easycron.bo.PageResult;
-import com.neil.easycron.bo.config.ConfigFileBo;
+import com.neil.easycron.bo.config.ConfigBo;
+import com.neil.easycron.bo.config.ConfigGroupBo;
 import com.neil.easycron.bo.job.JobBo;
 import com.neil.easycron.bo.job.JobLogBo;
 import com.neil.easycron.bo.job.JobLogRequest;
@@ -17,6 +19,7 @@ import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,15 +47,22 @@ public class JobApi {
         return ResponseHelper.ofNothing();
     }
 
+    @DeleteMapping("job/{jobId}")
+    @RequiresRoles("CRON_EDITOR")
+    public JsonEntity deleteJob(@PathVariable("jobId") Integer JobId) {
+        jobService.deleteJob(JobId);
+        return ResponseHelper.ofNothing();
+    }
+
     @GetMapping("configs/{jobId}")
     @RequiresRoles("CRON_EDITOR")
-    public JsonEntity<ConfigFileBo> getConfigs(@PathVariable("jobId") Integer jobId) {
-        return ResponseHelper.createInstance(jobService.getConfigs(jobId));
+    public JsonEntity<ConfigBo> getConfigs(@PathVariable("jobId") Integer jobId) {
+        return ResponseHelper.createInstance(new ConfigBo(jobService.getConfigs(jobId)));
     }
 
     @PutMapping("configs/{jobId}")
     @RequiresRoles("CRON_EDITOR")
-    public JsonEntity saveConfigs(@PathVariable("jobId") Integer jobId, @RequestBody Map<String, Object> configData) {
+    public JsonEntity saveConfigs(@PathVariable("jobId") Integer jobId, @RequestBody ConfigBo configData) {
         jobService.saveConfigs(jobId, configData);
         return ResponseHelper.ofNothing();
     }

@@ -1,6 +1,10 @@
 package com.neil.easycron.bo.job;
+import java.util.List;
+
 public class JobSearchRequest {
     private String keyword;
+    private List<Integer> status;
+    private List<Integer> plugins;
     private int page;
     private int size;
 
@@ -26,5 +30,21 @@ public class JobSearchRequest {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public List<Integer> getStatus() {
+        return status;
+    }
+
+    public void setStatus(List<Integer> status) {
+        this.status = status;
+    }
+
+    public List<Integer> getPlugins() {
+        return plugins;
+    }
+
+    public void setPlugins(List<Integer> plugins) {
+        this.plugins = plugins;
     }
 }

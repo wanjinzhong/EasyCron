@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -29,8 +30,9 @@ public class User implements Serializable {
     @Column(name = "email", length = 100, nullable = false)
     private String email;
 
-    @Column(name = "avatar", length = 200)
-    private String avatar;
+    @ManyToOne
+    @JoinColumn(name = "avatar")
+    private Resource avatar;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_role",
@@ -43,6 +45,10 @@ public class User implements Serializable {
 
     @Column(name = "salt", length = 20, nullable = false)
     private String salt;
+
+    @ManyToOne
+    @JoinColumn(name = "status")
+    private ListBox status;
 
     public Integer getId() {
         return id;
@@ -68,11 +74,11 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public String getAvatar() {
+    public Resource getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(String avatar) {
+    public void setAvatar(Resource avatar) {
         this.avatar = avatar;
     }
 
@@ -98,5 +104,13 @@ public class User implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public ListBox getStatus() {
+        return status;
+    }
+
+    public void setStatus(ListBox status) {
+        this.status = status;
     }
 }

@@ -5,28 +5,28 @@
             <Field name="catalog">JOB_STATUS</Field>
             <Field name="code">RUNNING</Field>
             <Field name="detail"></Field>
-            <Field name="displayName"></Field>
+            <Field name="displayName">正在运行</Field>
             <Field name="seq">1</Field>
         </Data>
         <Data>
             <Field name="catalog">JOB_STATUS</Field>
             <Field name="code">STOPPED</Field>
             <Field name="detail"></Field>
-            <Field name="displayName"></Field>
+            <Field name="displayName">已停止</Field>
             <Field name="seq">2</Field>
         </Data>
         <Data>
             <Field name="catalog">JOB_STATUS</Field>
             <Field name="code">CONFIG_ERROR</Field>
             <Field name="detail"></Field>
-            <Field name="displayName"></Field>
+            <Field name="displayName">配置错误</Field>
             <Field name="seq">3</Field>
         </Data>
         <Data>
             <Field name="catalog">JOB_STATUS</Field>
             <Field name="code">WAITING_CONFIG</Field>
             <Field name="detail"></Field>
-            <Field name="displayName"></Field>
+            <Field name="displayName">等待配置</Field>
             <Field name="seq">4</Field>
         </Data>
         <!--Job Running Status-->
@@ -51,32 +51,77 @@
             <Field name="displayName"></Field>
             <Field name="seq">3</Field>
         </Data>
+        <Data>
+            <Field name="catalog">RESOURCE_TYPE</Field>
+            <Field name="code">IMAGE</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName"></Field>
+            <Field name="seq">1</Field>
+        </Data>
+        <Data>
+            <Field name="catalog">USER_STATUS</Field>
+            <Field name="code">NORMAL</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName">正常</Field>
+            <Field name="seq">1</Field>
+        </Data>
+        <Data>
+            <Field name="catalog">USER_STATUS</Field>
+            <Field name="code">DISABLED</Field>
+            <Field name="detail"></Field>
+            <Field name="displayName">禁用</Field>
+            <Field name="seq">2</Field>
+        </Data>
     </Table>
 
     <Table name="Role">
         <Data>
-            <Field name="name">CRON_EDITOR</Field>
+            <Field name="code">NORMAL_USER</Field>
+            <Field name="name">普通用户</Field>
+            <Field name="desc">进入应用，查看任务列表</Field>
+            <Field name="permissions"></Field>
+        </Data>
+        <Data>
+            <Field name="code">CRON_EDITOR</Field>
+            <Field name="name">CRON管理员</Field>
+            <Field name="desc">添加、编辑、删除、测试CRON</Field>
             <Field name="permissions">cron:add,cron:update,cron:delete,cron:test</Field>
         </Data>
         <Data>
-            <Field name="name">CRON_OPERATOR</Field>
+            <Field name="code">CRON_OPERATOR</Field>
+            <Field name="name">CRON操作员</Field>
+            <Field name="desc">启动、停止CRON</Field>
             <Field name="permissions">cron:run,cron:stop</Field>
         </Data>
         <Data>
-            <Field name="name">USER_MANAGER</Field>
+            <Field name="code">USER_MANAGER</Field>
+            <Field name="name">人事管理员</Field>
+            <Field name="desc">添加、禁用用户，角色分配</Field>
             <Field name="permissions">user:add,user:dismiss,user:assign</Field>
         </Data>
         <Data>
-            <Field name="name">PLUGIN_OPERATOR</Field>
+            <Field name="code">PLUGIN_OPERATOR</Field>
+            <Field name="name">插件操作员</Field>
+            <Field name="desc">安装、卸载插件</Field>
             <Field name="permissions">plugin:install,plugin:uninstall</Field>
         </Data>
         <Data>
-            <Field name="name">PLUGIN_DEVELOPER</Field>
+            <Field name="code">PLUGIN_DEVELOPER</Field>
+            <Field name="name">插件开发者</Field>
+            <Field name="desc">上传插件到本地</Field>
             <Field name="permissions">plugin:upload</Field>
         </Data>
         <Data>
-            <Field name="name">PLUGIN_PUSHER</Field>
+            <Field name="code">PLUGIN_PUSHER</Field>
+            <Field name="name">插件发布者</Field>
+            <Field name="desc">发布插件到中央仓库</Field>
             <Field name="permissions">plugin:push</Field>
+        </Data>
+        <Data>
+            <Field name="code">SYSTEM_MANAGER</Field>
+            <Field name="name">系统管理员</Field>
+            <Field name="desc">系统设置</Field>
+            <Field name="permissions">system:setting</Field>
         </Data>
     </Table>
     <Table name="User">

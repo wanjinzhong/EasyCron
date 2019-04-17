@@ -35,6 +35,7 @@ public class PluginServiceImpl implements PluginService {
         pluginBo.setId(plugin.getId());
         pluginBo.setName(plugin.getName());
         pluginBo.setDesc(plugin.getDescription());
+        pluginBo.setPicture(plugin.getPicture() == null ? null : plugin.getPicture().getId());
         return pluginBo;
     }
 }

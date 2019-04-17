@@ -1,6 +1,7 @@
 package com.neil.easycron.dao.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -23,17 +24,23 @@ public class Role implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", length = 50, nullable = false)
+    @Column(name = "code", length = 50, nullable = false)
+    private String code;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "permissions", nullable = false)
+    @Column(name = "description")
+    private String desc;
+
+    @Column(name = "permissions")
     private String permissions;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_role",
                joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")},
                inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -41,6 +48,22 @@ public class Role implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public String getName() {

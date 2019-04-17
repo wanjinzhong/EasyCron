@@ -22,7 +22,7 @@ public class PluginApi {
     @Autowired
     private PluginService pluginService;
 
-    @GetMapping("plugin")
+    @GetMapping("plugins")
     public JsonEntity<List<PluginBo>> getPlugins() {
         return ResponseHelper.createInstance(pluginService.getAllPlugins());
     }
