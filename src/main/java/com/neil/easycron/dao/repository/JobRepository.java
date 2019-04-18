@@ -1,4 +1,6 @@
 package com.neil.easycron.dao.repository;
+import java.util.List;
+
 import com.neil.easycron.dao.entity.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,4 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JobRepository extends JpaRepository<Job, Integer>, JpaSpecificationExecutor<Job> {
     Job findByName(String name);
+    List<Job> findByStatusCode(String status);
 }

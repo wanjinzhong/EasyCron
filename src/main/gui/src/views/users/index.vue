@@ -18,7 +18,7 @@
       :v-loading="adding"
       title="添加帐户"
       width="30%"
-      @close="close">
+      @closed="close">
       <div v-if="addingStatus == 'FILLING'">
         <el-form ref="user" :model="user" :rules="rules">
           <el-form-item label="用户名" prop="name">
@@ -34,14 +34,22 @@
         </div>
       </div>
       <div v-else-if="addingStatus == 'SENDING'" style="text-align: center"><img :src="sending_img" style="width: 200px"></div>
-      <div v-else-if="addingStatus == 'COMPLETE'">
-        <div><svg-icon></svg-icon></div>
-        <div>
-        <div style="font-size: 18px; margin-bottom: 20px; font-weight: bold;">用户添加成功</div>
-        <div>已将用户名密码发送至<strong><i>{{ addUserRes.email }}</i></strong></div>
+      <div v-else-if="addingStatus == 'COMPLETE'" >
+        <div style="display: inline-block; vertical-align: top"><svg-icon icon-class="yes" style="color: #67C23A; font-size: 40px"/></div>
+        <div style="display: inline-block; margin-left: 15px">
+          <div style="font-size: 18px; margin-bottom: 20px; font-weight: bold;">用户添加成功</div>
+          <div>已将用户名密码发送至<strong><i>{{ addUserRes.email }}</i></strong></div>
         </div>
       </div>
-      <div v-else>邮箱配置有误</div>
+      <div v-else>
+        <div style="display: inline-block; vertical-align: top"><svg-icon icon-class="warning" style="color: #E6A23C; font-size: 40px"/></div>
+        <div style="display: inline-block; margin-left: 15px">
+          <div style="font-size: 18px; margin-bottom: 20px; font-weight: bold;">用户添加成功</div>
+          <div style="margin-bottom: 5px">由于配置或者网络原因，邮件发送失败</div>
+          <div style="margin-bottom: 5px">账号：<strong>{{ addUserRes.email }}</strong></div>
+          <div style="margin-bottom: 5px">密码：<strong style="color: red">{{ addUserRes.password }}</strong> (只显示一次)</div>
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -58,7 +66,7 @@ export default {
       showAddUser: false,
       user: {},
       adding: false,
-      addingStatus: 'COMPLETE',
+      addingStatus: 'FILLING',
       sending_img: SendingImg,
       addUserRes: {},
       rules: {

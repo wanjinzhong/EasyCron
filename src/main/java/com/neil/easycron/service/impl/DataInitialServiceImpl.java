@@ -7,6 +7,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.neil.easycron.constant.enums.ListCatalog;
+import com.neil.easycron.constant.enums.RoleCode;
 import com.neil.easycron.dao.entity.ListBox;
 import com.neil.easycron.dao.entity.Role;
 import com.neil.easycron.dao.entity.User;
@@ -132,6 +133,8 @@ public class DataInitialServiceImpl implements DataInitialService {
                 f.setAccessible(true);
                 if (f.getType().equals(Integer.class)) {
                     f.set(role, Integer.valueOf(field.content().get(0).getText()));
+                } else if (f.getType().equals(RoleCode.class)) {
+                    f.set(role, RoleCode.valueOf(CollectionUtils.isEmpty(field.content()) ? null : field.content().get(0).getText()));
                 } else {
                     f.set(role, CollectionUtils.isEmpty(field.content()) ? null : field.content().get(0).getText());
                 }

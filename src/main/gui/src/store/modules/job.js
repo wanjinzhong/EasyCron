@@ -1,4 +1,4 @@
-import { getJobs, getConfig, saveConfig, createNewJob, deleteJob } from '@/api/job'
+import { getJobs, getConfig, saveConfig, createNewJob, deleteJob, startJob, stopJob } from '@/api/job'
 import defaultPluginPic from '@/assets/default_plugin.png'
 
 const job = {
@@ -110,6 +110,24 @@ const job = {
     deleteJob({ commit }, id) {
       return new Promise((resolve, reject) => {
         deleteJob(id).then(response => {
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    startJob({ commit }, id) {
+      return new Promise((resolve, reject) => {
+        startJob(id).then(res => {
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    stopJob({ commit }, id) {
+      return new Promise((resolve, reject) => {
+        stopJob(id).then(res => {
           resolve()
         }).catch(error => {
           reject(error)

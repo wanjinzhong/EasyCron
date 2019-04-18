@@ -14,6 +14,7 @@ import com.neil.easycron.service.UserService;
 import com.neil.easycron.utils.ResponseHelper;
 import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +41,7 @@ public class UserApi {
     }
 
     @PostMapping("user")
+    @RequiresRoles(value = "USER_MANAGER")
     public JsonEntity<RegisterResultBo> register(@RequestBody RegisterRequestBo registerRequestBo) {
         RegisterResultBo res = userService.regist(registerRequestBo);
         return ResponseHelper.createInstance(res);
@@ -62,12 +64,14 @@ public class UserApi {
     }
 
     @PutMapping("user/{userId}/disable")
+    @RequiresRoles(value = "USER_MANAGER")
     public JsonEntity disableUser(@PathVariable("userId") Integer userId) {
         userService.updateUserStatus(userId, UserStatus.DISABLED);
         return ResponseHelper.ofNothing();
     }
 
     @PutMapping("user/{userId}/enable")
+    @RequiresRoles(value = "USER_MANAGER")
     public JsonEntity enableUser(@PathVariable("userId") Integer userId) {
         userService.updateUserStatus(userId, UserStatus.NORMAL);
         return ResponseHelper.ofNothing();

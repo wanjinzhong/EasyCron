@@ -17,7 +17,7 @@ import com.neil.easycron.bo.user.UserInfo;
 import com.neil.easycron.config.EasyCronToken;
 import com.neil.easycron.constant.Constant;
 import com.neil.easycron.constant.enums.ListCatalog;
-import com.neil.easycron.constant.enums.Roles;
+import com.neil.easycron.constant.enums.RoleCode;
 import com.neil.easycron.constant.enums.UserStatus;
 import com.neil.easycron.dao.entity.ListBox;
 import com.neil.easycron.dao.entity.Role;
@@ -35,7 +35,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -98,7 +97,11 @@ public class UserServiceImpl implements UserService {
         user.setName(registerRequestBo.getName());
         user.setSalt(salt);
         user.setPassword(securityPwd);
-       // userRepository.save(user);
+        ListBox normal = listBoxRepository.findByCatalogAndCode(ListCatalog.USER_STATUS, UserStatus.NORMAL.name());
+        user.setStatus(normal);
+        Role role = roleRepository.findByCode(RoleCode.NORMAL_USER);
+        user.getRoles().add(role);
+        userRepository.save(user);
         RegisterResultBo resultBo = new RegisterResultBo();
         boolean status = mailService.sendNewUserEmail(user.getEmail(), pwd, user.getName());
         resultBo.setEmailSuccess(status);
@@ -126,7 +129,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setStatusCode(user.getStatus().getCode());
 
         userInfo.setRoles(user.getRoles().stream().map(role -> {
-            boolean deletable = !(Roles.NORMAL_USER.name().equals(role.getCode()) || Roles.USER_MANAGER.name().equals(role.getCode()) && role.getUsers().size() <= 1);
+            boolean deletable = !(RoleCode.NORMAL_USER.name().equals(role.getCode()) || RoleCode.USER_MANAGER.name().equals(role.getCode()) && role.getUsers().size() <= 1);
             return new BasicRoleBo(role.getId(), role.getCode(), role.getName(), role.getDesc(), deletable);
         }).collect(
             Collectors.toList()));
@@ -169,7 +172,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BizException("用户不存在");
         }
-        Role role = user.getRoles().stream().filter(r -> Roles.USER_MANAGER.name().equals(r.getCode())).findFirst().orElse(null);
+        Role role = user.getRoles().stream().filter(r -> RoleCode.USER_MANAGER.name().equals(r.getCode())).findFirst().orElse(null);
         if (role != null && role.getUsers().size() <= 1) {
             throw new BizException("不能禁用该帐户，因为该帐户是唯一" + role.getName());
         }
@@ -195,8 +198,8 @@ public class UserServiceImpl implements UserService {
             activeUserCount[0] += UserStatus.NORMAL.name().equals(u.getStatus().getCode()) ? 1 : 0;
             return user;
         }).collect(Collectors.toList()));
-        roleInfo.setUserDeletable(!(Roles.NORMAL_USER.name().equals(role.getCode()) || Roles.USER_MANAGER.name().equals(role.getCode())
-                                                                                       && activeUserCount.length <= 1));
+        roleInfo.setUserDeletable(!(RoleCode.NORMAL_USER.name().equals(role.getCode()) || RoleCode.USER_MANAGER.name().equals(role.getCode())
+                                                                                          && activeUserCount.length <= 1));
         return roleInfo;
     }
 }

@@ -5,6 +5,8 @@ import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.neil.easycron.constant.enums.YorN;
 
 @Entity
 @Table(name = "job_log",indexes = {
@@ -35,7 +39,8 @@ public class JobLog implements Serializable {
     private ListBox status;
 
     @Column(name = "resolved", length = 1)
-    private String resolved;
+    @Enumerated(EnumType.STRING)
+    private YorN resolved;
 
     @Column(name = "message")
     @Lob
@@ -94,11 +99,11 @@ public class JobLog implements Serializable {
         this.status = status;
     }
 
-    public String getResolved() {
+    public YorN getResolved() {
         return resolved;
     }
 
-    public void setResolved(String resolved) {
+    public void setResolved(YorN resolved) {
         this.resolved = resolved;
     }
 

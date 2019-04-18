@@ -1,7 +1,9 @@
 package com.neil.easycron.bo.role;
+import com.neil.easycron.constant.enums.RoleCode;
+
 public class BasicRoleBo {
     private Integer id;
-    private String code;
+    private RoleCode code;
     private String name;
     private String desc;
     private Boolean deletable;
@@ -9,7 +11,7 @@ public class BasicRoleBo {
     public BasicRoleBo() {
     }
 
-    public BasicRoleBo(Integer id, String code, String name, String desc, Boolean deletable) {
+    public BasicRoleBo(Integer id, RoleCode code, String name, String desc, Boolean deletable) {
         this.id = id;
         this.code = code;
         this.name = name;
@@ -25,11 +27,11 @@ public class BasicRoleBo {
         this.id = id;
     }
 
-    public String getCode() {
+    public RoleCode getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(RoleCode code) {
         this.code = code;
     }
 

@@ -26,11 +26,12 @@ import com.neil.easycron.bo.config.ConfigItemBo;
 import com.neil.easycron.bo.config.ConfigOption;
 import com.neil.easycron.bo.job.JobBo;
 import com.neil.easycron.bo.job.JobSearchRequest;
+import com.neil.easycron.bo.user.UserInfo;
 import com.neil.easycron.constant.Constant;
 import com.neil.easycron.constant.enums.ConfigItemType;
 import com.neil.easycron.constant.enums.JobStatus;
 import com.neil.easycron.constant.enums.ListCatalog;
-import com.neil.easycron.constant.enums.Roles;
+import com.neil.easycron.constant.enums.RoleCode;
 import com.neil.easycron.dao.entity.Job;
 import com.neil.easycron.dao.entity.ListBox;
 import com.neil.easycron.dao.entity.Plugin;
@@ -39,8 +40,14 @@ import com.neil.easycron.dao.repository.JobRepository;
 import com.neil.easycron.dao.repository.ListBoxRepository;
 import com.neil.easycron.dao.repository.PluginRepository;
 import com.neil.easycron.exception.BizException;
+import com.neil.easycron.plugin.bo.JobRunningResult;
+import com.neil.easycron.plugin.bo.SingleMessage;
+import com.neil.easycron.plugin.constant.JobRunningStatus;
 import com.neil.easycron.plugin.service.EasyJobService;
+import com.neil.easycron.service.CronJob;
+import com.neil.easycron.service.JobLogService;
 import com.neil.easycron.service.JobService;
+import com.neil.easycron.service.UserService;
 import com.neil.easycron.utils.FileUtil;
 import com.neil.easycron.utils.JobPluginUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +60,17 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.quartz.CronExpression;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.CronTrigger;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -73,6 +91,17 @@ public class JobServiceImpl implements JobService {
 
     @Autowired
     private PluginRepository pluginRepository;
+
+    @Autowired
+    private JobLogService jobLogService;
+
+    @Autowired
+    private Scheduler scheduler;
+
+    @Autowired
+    private UserService userService;
+
+    private Logger logger = LoggerFactory.getLogger(JobServiceImpl.class);
 
     @Override
     public void createNewJob(NewJobBo newJobBo) {
@@ -134,6 +163,14 @@ public class JobServiceImpl implements JobService {
             }
             throw new BizException("读取配置文件失败", e);
         }
+    }
+
+    @Override
+    public Map<String, Object> getConfigMap(Integer jobId) {
+        List<ConfigGroupBo> configGroupBos = getConfigs(jobId);
+        Map<String, Object> configs = new HashMap<>();
+        configGroupBos.forEach(group -> group.getItems().forEach(item -> configs.put(item.getId(), item.getValue())));
+        return configs;
     }
 
     @Override
@@ -293,6 +330,13 @@ public class JobServiceImpl implements JobService {
         }
         jobRepository.save(job);
         saveConfigFile(file, configMap);
+        restartJob(jobId);
+    }
+
+    @Override
+    public void restartJob(Integer jobId) {
+        stopJob(jobId);
+        runJob(jobId);
     }
 
     private Map<String, Object> configBoToMap(ConfigBo configData) {
@@ -317,6 +361,7 @@ public class JobServiceImpl implements JobService {
     public void deleteJob(Integer jobId) {
         // stop job
         // delete job log
+        stopJob(jobId);
         jobRepository.deleteById(jobId);
         File jobHome = new File(Constant.ROOT_PATH + "/jobs/" + jobId);
         if (jobHome.exists() && !FileUtil.deleteDir(jobHome)) {
@@ -324,10 +369,68 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+    @Override
+    public void runJob(Integer jobId) {
+        Job job = jobRepository.findById(jobId).orElse(null);
+        if (job == null) {
+            throw new BizException("任务不存在");
+        }
+
+        Calendar start = Calendar.getInstance();
+        JobDataMap dataMap = new JobDataMap();
+        dataMap.put(Constant.JobParam.JOB, job);
+        dataMap.put(Constant.JobParam.START_TIME, start);
+
+        Integer userId = 1;
+        try {
+            UserInfo userInfo = userService.getUserInfo();
+            if (userInfo != null && userInfo.getId() != null) {
+                userId = userInfo.getId();
+            }
+        }catch (Exception e) {
+            userId = 1;
+        }
+        dataMap.put(Constant.JobParam.ENTRY_USER, userId);
+        try {
+            JobDetail jobDetail = JobBuilder.newJob(CronJob.class).withIdentity("JOB-" + job.getId(), "GROUP-" + job.getId()).setJobData(dataMap).build();
+            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(job.getExpression());
+            CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("JOB-" + job.getId(), "GROUP-" + job.getId()).withSchedule(scheduleBuilder).build();
+            scheduler.scheduleJob(jobDetail, cronTrigger);
+            ListBox running = listBoxRepository.findByCatalogAndCode(ListCatalog.JOB_STATUS, JobStatus.RUNNING.name());
+            job.setStatus(running);
+        } catch (SchedulerException e) {
+            logger.error("ERROR: " + e.getMessage(), e);
+            JobRunningResult result = new JobRunningResult();
+            result.setRunningStatus(JobRunningStatus.FAILED);
+            result.getMessage().add(new SingleMessage(Calendar.getInstance(), e.getMessage()));
+            jobLogService.writeJobLog(jobId, start, Calendar.getInstance(), result, userId);
+            ListBox stopped = listBoxRepository.findByCatalogAndCode(ListCatalog.JOB_STATUS, JobStatus.STOPPED.name());
+            job.setStatus(stopped);
+        } finally {
+            jobRepository.save(job);
+        }
+    }
+
+    @Override
+    public void stopJob(Integer jobId) {
+        Job job = jobRepository.findById(jobId).orElse(null);
+        if (job == null) {
+            throw new BizException("任务不存在");
+        }
+        try {
+            scheduler.deleteJob(new JobKey("JOB-" + job.getId(), "GROUP-" + job.getId()));
+            ListBox stopped = listBoxRepository.findByCatalogAndCode(ListCatalog.JOB_STATUS, JobStatus.STOPPED.name());
+            job.setStatus(stopped);
+            jobRepository.save(job);
+        } catch (SchedulerException e) {
+            throw new BizException("无法停止任务：" + e.getMessage(), e);
+        }
+    }
+
     private List<JobBo> jobToBos(Page<Job> jobs) {
         Subject subject = SecurityUtils.getSubject();
-        boolean editable = subject.hasRole(Roles.CRON_EDITOR.name());
-        boolean operable = subject.hasRole(Roles.CRON_OPERATOR.name());
+        boolean editable = subject.hasRole(RoleCode.CRON_EDITOR.name());
+        boolean operable = subject.hasRole(RoleCode.CRON_OPERATOR.name());
         return jobs.get().map(job -> {
             JobBo jobBo = new JobBo();
             jobBo.setId(job.getId());

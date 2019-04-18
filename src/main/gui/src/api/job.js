@@ -37,3 +37,17 @@ export function deleteJob(id) {
     method: 'delete'
   })
 }
+
+export function startJob(id) {
+  return request({
+    url: '/job/' + id + '/start',
+    method: 'post'
+  })
+}
+
+export function stopJob(id) {
+  return request({
+    url: '/job/' + id + '/stop',
+    method: 'post'
+  })
+}

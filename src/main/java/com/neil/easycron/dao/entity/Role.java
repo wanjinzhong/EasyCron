@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +18,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.neil.easycron.constant.enums.RoleCode;
+
 @Entity
 @Table(name = "role", uniqueConstraints = {@UniqueConstraint(columnNames = "name", name = "role_I1")})
 public class Role implements Serializable {
@@ -25,7 +29,8 @@ public class Role implements Serializable {
     private Integer id;
 
     @Column(name = "code", length = 50, nullable = false)
-    private String code;
+    @Enumerated(EnumType.STRING)
+    private RoleCode code;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -50,11 +55,11 @@ public class Role implements Serializable {
         this.id = id;
     }
 
-    public String getCode() {
+    public RoleCode getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(RoleCode code) {
         this.code = code;
     }
 

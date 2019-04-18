@@ -79,14 +79,16 @@
                 v-if="scope.row.status === 'STOPPED'&& scope.row.operable "
                 icon-class="start"
                 class="optBtn"
-                style="color: #67C23A"/>
+                style="color: #67C23A"
+                @click="start(scope.row.id, scope.row.name)"/>
             </el-tooltip>
             <el-tooltip :open-delay="500" class="item" effect="light" content="停止" placement="top-start">
               <svg-icon
                 v-if="scope.row.status === 'RUNNING' && scope.row.operable "
                 icon-class="stop"
                 class="optBtn"
-                style="color: #F56C6C"/>
+                style="color: #F56C6C"
+                @click="stop(scope.row.id, scope.row.name)"/>
             </el-tooltip>
             <el-tooltip :open-delay="500" class="item" effect="light" content="配置" placement="top-start">
               <svg-icon
@@ -170,6 +172,7 @@ export default {
   data() {
     return {
       loading: false,
+      interval: undefined,
       keyword: this.$store.state.job.keyword,
       searchStatus: this.$store.state.job.searchStatus,
       selectedPlugin: this.$store.state.job.selectedPlugin,
@@ -200,22 +203,25 @@ export default {
     }
   },
   mounted() {
-    this.reload()
+    this.reload(true)
+    this.interval = setInterval(() => {
+      this.reload(false)
+    }, 5000)
   },
   methods: {
-    reload() {
-      this.loading = true
+    reload(loadingNeed) {
+      this.loading = loadingNeed
       this.$store.dispatch('getJobs').then((res) => {
         this.loading = false
       })
     },
     sizeChange(val) {
       this.$store.commit('SET_SIZE', val)
-      this.reload()
+      this.reload(true)
     },
     currentChange(val) {
       this.$store.commit('SET_PAGE', val)
-      this.reload()
+      this.reload(true)
     },
     config(id) {
       this.loading = true
@@ -238,7 +244,7 @@ export default {
         this.loading = false
         this.$message.success('删除成功')
         this.showDelete = false
-        this.reload()
+        this.reload(true)
       }).catch(() => {
         this.loading = false
       })
@@ -247,6 +253,18 @@ export default {
       this.confirmDeleteName = ''
       this.deleteId = ''
       this.deleteName = ''
+    },
+    start(jobId, name) {
+      this.$store.dispatch('startJob', jobId).then(res => {
+        this.$message.success('已启动任务：' + name)
+        this.reload(true)
+      })
+    },
+    stop(jobId, name) {
+      this.$store.dispatch('stopJob', jobId).then(res => {
+        this.$message.success('已停止任务：' + name)
+        this.reload(true)
+      })
     }
   }
 }

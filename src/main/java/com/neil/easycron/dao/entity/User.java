@@ -1,6 +1,7 @@
 package com.neil.easycron.dao.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -38,7 +39,7 @@ public class User implements Serializable {
     @JoinTable(name = "user_role",
                joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
                inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 
     @Column(name = "password", length = 50, nullable = false)
     private String password;
@@ -47,7 +48,7 @@ public class User implements Serializable {
     private String salt;
 
     @ManyToOne
-    @JoinColumn(name = "status")
+    @JoinColumn(name = "status", nullable = false)
     private ListBox status;
 
     public Integer getId() {

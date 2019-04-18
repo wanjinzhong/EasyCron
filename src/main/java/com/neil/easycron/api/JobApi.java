@@ -1,12 +1,8 @@
 package com.neil.easycron.api;
 
-import java.util.List;
-import java.util.Map;
-
 import com.neil.easycron.bo.NewJobBo;
 import com.neil.easycron.bo.PageResult;
 import com.neil.easycron.bo.config.ConfigBo;
-import com.neil.easycron.bo.config.ConfigGroupBo;
 import com.neil.easycron.bo.job.JobBo;
 import com.neil.easycron.bo.job.JobLogBo;
 import com.neil.easycron.bo.job.JobLogRequest;
@@ -75,5 +71,17 @@ public class JobApi {
     @PostMapping("logs")
     public JsonEntity<PageResult<JobLogBo>> getJobLogs(@RequestBody JobLogRequest request) {
         return ResponseHelper.createInstance(jobLogService.getJobLogs(request));
+    }
+
+    @PostMapping("job/{jobId}/start")
+    public JsonEntity startJob(@PathVariable("jobId") Integer jobId) {
+        jobService.runJob(jobId);
+        return ResponseHelper.ofNothing();
+    }
+
+    @PostMapping("job/{jobId}/stop")
+    public JsonEntity stopJob(@PathVariable("jobId") Integer jobId) {
+        jobService.stopJob(jobId);
+        return ResponseHelper.ofNothing();
     }
 }

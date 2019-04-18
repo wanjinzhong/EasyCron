@@ -1,5 +1,5 @@
 package com.neil.easycron.constant.enums;
-public enum Roles {
+public enum RoleCode {
     NORMAL_USER,
     CRON_EDITOR,
     CRON_OPERATOR,
