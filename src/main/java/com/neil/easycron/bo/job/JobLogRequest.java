@@ -1,11 +1,6 @@
 package com.neil.easycron.bo.job;
-import java.util.ArrayList;
-import java.util.List;
-
 public class JobLogRequest {
     private Integer jobId;
-    private List<Integer> status = new ArrayList<>();
-    private boolean onlyResolved = false;
     private boolean asc;
     private int page;
     private int size;
@@ -17,22 +12,6 @@ public class JobLogRequest {
 
     public void setJobId(Integer jobId) {
         this.jobId = jobId;
-    }
-
-    public List<Integer> getStatus() {
-        return status;
-    }
-
-    public void setStatus(List<Integer> status) {
-        this.status = status;
-    }
-
-    public boolean isOnlyResolved() {
-        return onlyResolved;
-    }
-
-    public void setOnlyResolved(boolean onlyResolved) {
-        this.onlyResolved = onlyResolved;
     }
 
     public int getPage() {

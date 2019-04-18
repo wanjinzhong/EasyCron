@@ -18,7 +18,7 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import com.neil.easycron.bo.NewJobBo;
+import com.neil.easycron.bo.job.NewJobBo;
 import com.neil.easycron.bo.PageResult;
 import com.neil.easycron.bo.config.ConfigBo;
 import com.neil.easycron.bo.config.ConfigGroupBo;
@@ -376,10 +376,8 @@ public class JobServiceImpl implements JobService {
             throw new BizException("任务不存在");
         }
 
-        Calendar start = Calendar.getInstance();
         JobDataMap dataMap = new JobDataMap();
         dataMap.put(Constant.JobParam.JOB, job);
-        dataMap.put(Constant.JobParam.START_TIME, start);
 
         Integer userId = 1;
         try {
@@ -400,10 +398,6 @@ public class JobServiceImpl implements JobService {
             job.setStatus(running);
         } catch (SchedulerException e) {
             logger.error("ERROR: " + e.getMessage(), e);
-            JobRunningResult result = new JobRunningResult();
-            result.setRunningStatus(JobRunningStatus.FAILED);
-            result.getMessage().add(new SingleMessage(Calendar.getInstance(), e.getMessage()));
-            jobLogService.writeJobLog(jobId, start, Calendar.getInstance(), result, userId);
             ListBox stopped = listBoxRepository.findByCatalogAndCode(ListCatalog.JOB_STATUS, JobStatus.STOPPED.name());
             job.setStatus(stopped);
         } finally {

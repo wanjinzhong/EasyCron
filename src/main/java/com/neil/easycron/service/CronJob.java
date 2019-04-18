@@ -32,10 +32,10 @@ public class CronJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         com.neil.easycron.dao.entity.Job job = (com.neil.easycron.dao.entity.Job) dataMap.get(Constant.JobParam.JOB);
-        Calendar start = (Calendar) dataMap.get(Constant.JobParam.START_TIME);
         Integer userId = (Integer) dataMap.get(Constant.JobParam.ENTRY_USER);
         EasyJobService easyJobService = JobPluginUtil.getJobService(job.getPlugin());
         Map<String, Object> configs = jobService.getConfigMap(job.getId());
+        Calendar start = Calendar.getInstance();
         JobRunningResult result = easyJobService.serve(configs);
         logger.info(context.getJobDetail().getKey().toString() + " is running");
         jobLogService.writeJobLog(job.getId(), start, java.util.Calendar.getInstance(), result, userId);

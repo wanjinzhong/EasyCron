@@ -103,7 +103,8 @@
               <svg-icon
                 v-if="scope.row.logVisiable"
                 icon-class="log"
-                class="optBtn"/>
+                class="optBtn"
+                @click="showLogDialog(scope.row.id)"/>
             </el-tooltip>
             <el-tooltip :open-delay="500" class="item" effect="light" content="删除" placement="top-start">
               <svg-icon
@@ -158,6 +159,13 @@
         @click="confirmedDelete">确定删除
       </el-button>
     </el-dialog>
+    <el-dialog
+      :visible.sync="showLog"
+      title="日志"
+      width="70%"
+      @closed="closeDeleteDialog">
+      <JobLog v-model="jobIdForLog"/>
+    </el-dialog>
   </div>
 </template>
 
@@ -165,10 +173,11 @@
 import JobConfig from '@/components/Job/JobConfig'
 import NewJob from '@/components/Job/NewJob'
 import { hasRole } from '@/utils/permission'
+import JobLog from '@/components/JobLog'
 
 export default {
   name: 'JobList',
-  components: { JobConfig, NewJob },
+  components: { JobConfig, NewJob, JobLog },
   data() {
     return {
       loading: false,
@@ -179,6 +188,8 @@ export default {
       showConfig: false,
       showNewJob: false,
       showDelete: false,
+      showLog: false,
+      jobIdForLog: 0,
       configId: 0,
       deleteId: '',
       deleteName: '',
@@ -265,6 +276,10 @@ export default {
         this.$message.success('已停止任务：' + name)
         this.reload(true)
       })
+    },
+    showLogDialog(jobId) {
+      this.jobIdForLog = jobId
+      this.showLog = true
     }
   }
 }

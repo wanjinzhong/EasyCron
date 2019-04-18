@@ -1,4 +1,4 @@
-package com.neil.easycron.bo;
+package com.neil.easycron.bo.job;
 public class NewJobBo {
     private Integer pluginId;
     private String name;

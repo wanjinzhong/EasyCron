@@ -1,10 +1,10 @@
 package com.neil.easycron.service.impl;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.neil.easycron.bo.PageResult;
+import com.neil.easycron.bo.job.JobLogBasicBo;
 import com.neil.easycron.bo.job.JobLogBo;
 import com.neil.easycron.bo.job.JobLogRequest;
 import com.neil.easycron.constant.Constant;
@@ -18,8 +18,8 @@ import com.neil.easycron.dao.repository.JobLogRepository;
 import com.neil.easycron.dao.repository.JobRepository;
 import com.neil.easycron.dao.repository.ListBoxRepository;
 import com.neil.easycron.dao.repository.UserRepository;
+import com.neil.easycron.exception.BizException;
 import com.neil.easycron.plugin.bo.JobRunningResult;
-import com.neil.easycron.plugin.bo.SingleMessage;
 import com.neil.easycron.plugin.constant.JobRunningStatus;
 import com.neil.easycron.service.JobLogService;
 import org.slf4j.Logger;
@@ -29,7 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 @Service
 @Transactional
@@ -50,41 +49,46 @@ public class JobLogServiceImpl implements JobLogService {
     private Logger logger = LoggerFactory.getLogger(JobLogServiceImpl.class);
 
     @Override
-    public PageResult<JobLogBo> getJobLogs(JobLogRequest request) {
-        if (CollectionUtils.isEmpty(request.getStatus())) {
-            return new PageResult<>(request.getPage(), request.getSize(), 0, 0, new ArrayList<>());
-        }
+    public PageResult<JobLogBasicBo> getJobLogs(JobLogRequest request) {
         Page<JobLog> jobLogs;
         PageRequest pageRequest = PageRequest.of(request.getPage() - 1, request.getSize());
         if (request.getPage() == 1) {
             if (request.isAsc()) {
-                jobLogs = jobLogRepository.findByJobIdAndStatusIdInAndResolvedOrderByEntryDatetimeAsc(request.getJobId(), request.getStatus(),
-                                                                                                      request.isOnlyResolved() ? "Y" : "N", pageRequest);
+                jobLogs = jobLogRepository.findByJobIdOrderByEntryDatetimeAsc(request.getJobId(), pageRequest);
             } else {
-                jobLogs = jobLogRepository.findByJobIdAndStatusIdInAndResolvedOrderByEntryDatetimeDesc(request.getJobId(), request.getStatus(),
-                                                                                                       request.isOnlyResolved() ? "Y" : "N", pageRequest);
+                jobLogs = jobLogRepository.findByJobIdOrderByEntryDatetimeDesc(request.getJobId(), pageRequest);
             }
         } else {
             if (request.isAsc()) {
-                jobLogs = jobLogRepository.findByJobIdAndStatusIdInAndResolvedAndIdGreaterThanOrderByEntryDatetimeAsc(request.getJobId(), request.getStatus(),
-                                                                                                                      request.isOnlyResolved() ? "Y" : "N",
-                                                                                                                      request.getLatestId(), pageRequest);
+                jobLogs = jobLogRepository.findByJobIdAndIdGreaterThanOrderByEntryDatetimeAsc(request.getJobId(), request.getLatestId(), pageRequest);
             } else {
-                jobLogs = jobLogRepository.findByJobIdAndStatusIdInAndResolvedAndIdIsLessThanOrderByEntryDatetimeDesc(request.getJobId(), request.getStatus(),
-                                                                                                                      request.isOnlyResolved() ? "Y" : "N",
-                                                                                                                      request.getLatestId(), pageRequest);
+                jobLogs = jobLogRepository.findByJobIdAndIdIsLessThanOrderByEntryDatetimeDesc(request.getJobId(), request.getLatestId(), pageRequest);
             }
         }
-        List<JobLogBo> logs = jobLogs.get().map(log -> {
-            JobLogBo logBo = new JobLogBo();
-            logBo.setStartTime(log.getStartTime());
-            logBo.setEndTime(log.getEndTime());
-            logBo.setDuring((log.getEndTime().getTimeInMillis() - log.getStartTime().getTimeInMillis()) * 1.0 / 1000);
-            logBo.setMessage(log.getMessage());
-            logBo.setResolved(YorN.Y.equals(log.getResolved()));
-            return logBo;
-        }).collect(Collectors.toList());
+        List<JobLogBasicBo> logs = jobLogs.get().map(log -> toJobLogBasicBo(log)).collect(Collectors.toList());
         return new PageResult<>(request.getPage(), request.getSize(), jobLogs.getTotalPages(), jobLogs.getTotalElements(), logs);
+    }
+
+    private JobLogBasicBo toJobLogBasicBo(JobLog log) {
+        JobLogBasicBo logBo = new JobLogBasicBo();
+        logBo.setId(log.getId());
+        logBo.setStartTime(log.getStartTime());
+        logBo.setEndTime(log.getEndTime());
+        logBo.setResolved(YorN.Y.equals(log.getResolved()));
+        logBo.setStatus(JobRunningStatus.valueOf(log.getStatus().getCode()));
+        return logBo;
+    }
+
+    private JobLogBo toJobLogBo(JobLog log) {
+        JobLogBo logBo = new JobLogBo();
+        logBo.setId(log.getId());
+        logBo.setStartTime(log.getStartTime());
+        logBo.setEndTime(log.getEndTime());
+        logBo.setDuring((log.getEndTime().getTimeInMillis() - log.getStartTime().getTimeInMillis()) * 1.0 / 1000);
+        logBo.setMessage(log.getMessage());
+        logBo.setResolved(YorN.Y.equals(log.getResolved()));
+        logBo.setStatus(JobRunningStatus.valueOf(log.getStatus().getCode()));
+        return logBo;
     }
 
     @Override
@@ -111,5 +115,14 @@ public class JobLogServiceImpl implements JobLogService {
         runningResult.getMessage().forEach(m -> stringBuilder.append(Constant.FULL_DATE_FORMAT.format(m.getTime().getTime()) + "  " + m.getMessage() + "\r\n"));
         jobLog.setMessage(stringBuilder.toString());
         jobLogRepository.save(jobLog);
+    }
+
+    @Override
+    public JobLogBo getJobLogDetail(Long logId) {
+        JobLog log =  jobLogRepository.findById(logId).orElse(null);
+        if (log == null) {
+            throw new BizException("日志不存在，可能已被清理");
+        }
+        return toJobLogBo(log);
     }
 }

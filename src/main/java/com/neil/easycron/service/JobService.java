@@ -2,7 +2,7 @@ package com.neil.easycron.service;
 import java.util.List;
 import java.util.Map;
 
-import com.neil.easycron.bo.NewJobBo;
+import com.neil.easycron.bo.job.NewJobBo;
 import com.neil.easycron.bo.PageResult;
 import com.neil.easycron.bo.config.ConfigBo;
 import com.neil.easycron.bo.config.ConfigGroupBo;
