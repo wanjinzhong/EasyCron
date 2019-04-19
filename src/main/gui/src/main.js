@@ -17,7 +17,7 @@ import i18n from './lang' // Internationalization
 import './icons' // icon
 import './errorLog' // error log
 import './permission' // permission control
-
+import { formatDate } from './utils/TimeFormater'
 import * as filters from './filters' // global filters
 
 Vue.use(Element, {
@@ -31,7 +31,7 @@ Object.keys(filters).forEach(key => {
 })
 
 Vue.config.productionTip = false
-
+Vue.filter('formatDate', formatDate)
 new Vue({
   el: '#app',
   router,

@@ -9,7 +9,6 @@ import com.neil.easycron.bo.job.JobLogBo;
 import com.neil.easycron.bo.job.JobLogRequest;
 import com.neil.easycron.constant.Constant;
 import com.neil.easycron.constant.enums.ListCatalog;
-import com.neil.easycron.constant.enums.YorN;
 import com.neil.easycron.dao.entity.Job;
 import com.neil.easycron.dao.entity.JobLog;
 import com.neil.easycron.dao.entity.ListBox;
@@ -52,18 +51,10 @@ public class JobLogServiceImpl implements JobLogService {
     public PageResult<JobLogBasicBo> getJobLogs(JobLogRequest request) {
         Page<JobLog> jobLogs;
         PageRequest pageRequest = PageRequest.of(request.getPage() - 1, request.getSize());
-        if (request.getPage() == 1) {
-            if (request.isAsc()) {
-                jobLogs = jobLogRepository.findByJobIdOrderByEntryDatetimeAsc(request.getJobId(), pageRequest);
-            } else {
-                jobLogs = jobLogRepository.findByJobIdOrderByEntryDatetimeDesc(request.getJobId(), pageRequest);
-            }
+        if (request.isAsc()) {
+            jobLogs = jobLogRepository.findByJobIdOrderByStartTimeAsc(request.getJobId(), pageRequest);
         } else {
-            if (request.isAsc()) {
-                jobLogs = jobLogRepository.findByJobIdAndIdGreaterThanOrderByEntryDatetimeAsc(request.getJobId(), request.getLatestId(), pageRequest);
-            } else {
-                jobLogs = jobLogRepository.findByJobIdAndIdIsLessThanOrderByEntryDatetimeDesc(request.getJobId(), request.getLatestId(), pageRequest);
-            }
+            jobLogs = jobLogRepository.findByJobIdOrderByStartTimeDesc(request.getJobId(), pageRequest);
         }
         List<JobLogBasicBo> logs = jobLogs.get().map(log -> toJobLogBasicBo(log)).collect(Collectors.toList());
         return new PageResult<>(request.getPage(), request.getSize(), jobLogs.getTotalPages(), jobLogs.getTotalElements(), logs);
@@ -74,7 +65,6 @@ public class JobLogServiceImpl implements JobLogService {
         logBo.setId(log.getId());
         logBo.setStartTime(log.getStartTime());
         logBo.setEndTime(log.getEndTime());
-        logBo.setResolved(YorN.Y.equals(log.getResolved()));
         logBo.setStatus(JobRunningStatus.valueOf(log.getStatus().getCode()));
         return logBo;
     }
@@ -84,9 +74,7 @@ public class JobLogServiceImpl implements JobLogService {
         logBo.setId(log.getId());
         logBo.setStartTime(log.getStartTime());
         logBo.setEndTime(log.getEndTime());
-        logBo.setDuring((log.getEndTime().getTimeInMillis() - log.getStartTime().getTimeInMillis()) * 1.0 / 1000);
         logBo.setMessage(log.getMessage());
-        logBo.setResolved(YorN.Y.equals(log.getResolved()));
         logBo.setStatus(JobRunningStatus.valueOf(log.getStatus().getCode()));
         return logBo;
     }
@@ -96,13 +84,7 @@ public class JobLogServiceImpl implements JobLogService {
         JobLog jobLog = new JobLog();
         jobLog.setStartTime(start);
         jobLog.setEndTime(end);
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            user = userRepository.findById(1).orElse(null);
-        }
-        jobLog.setEntryUser(user);
         jobLog.setEntryDatetime(Calendar.getInstance());
-        jobLog.setResolved(YorN.N);
         Job job = jobRepository.findById(jobId).orElse(null);
         if (job == null) {
             logger.error("任务不存在，可能已被删除");
@@ -112,17 +94,29 @@ public class JobLogServiceImpl implements JobLogService {
         ListBox status = listBoxRepository.findByCatalogAndCode(ListCatalog.JOB_RUNNING_STATUS, runningResult.getRunningStatus().name());
         jobLog.setStatus(status);
         StringBuilder stringBuilder = new StringBuilder();
-        runningResult.getMessage().forEach(m -> stringBuilder.append(Constant.FULL_DATE_FORMAT.format(m.getTime().getTime()) + "  " + m.getMessage() + "\r\n"));
+        runningResult.getMessage().forEach(m -> {
+            stringBuilder.append(Constant.FULL_DATE_FORMAT.format(m.getTime().getTime()))
+                         .append("  ")
+                         .append(m.getLevel().name())
+                         .append("\t")
+                         .append(m.getMessage())
+                         .append("\r\n");
+        });
         jobLog.setMessage(stringBuilder.toString());
         jobLogRepository.save(jobLog);
     }
 
     @Override
     public JobLogBo getJobLogDetail(Long logId) {
-        JobLog log =  jobLogRepository.findById(logId).orElse(null);
+        JobLog log = jobLogRepository.findById(logId).orElse(null);
         if (log == null) {
             throw new BizException("日志不存在，可能已被清理");
         }
         return toJobLogBo(log);
+    }
+
+    @Override
+    public void cleanLog(Integer jobId) {
+        jobLogRepository.deleteByJobId(jobId);
     }
 }

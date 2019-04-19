@@ -18,7 +18,6 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import com.neil.easycron.bo.job.NewJobBo;
 import com.neil.easycron.bo.PageResult;
 import com.neil.easycron.bo.config.ConfigBo;
 import com.neil.easycron.bo.config.ConfigGroupBo;
@@ -26,6 +25,7 @@ import com.neil.easycron.bo.config.ConfigItemBo;
 import com.neil.easycron.bo.config.ConfigOption;
 import com.neil.easycron.bo.job.JobBo;
 import com.neil.easycron.bo.job.JobSearchRequest;
+import com.neil.easycron.bo.job.NewJobBo;
 import com.neil.easycron.bo.user.UserInfo;
 import com.neil.easycron.constant.Constant;
 import com.neil.easycron.constant.enums.ConfigItemType;
@@ -40,9 +40,6 @@ import com.neil.easycron.dao.repository.JobRepository;
 import com.neil.easycron.dao.repository.ListBoxRepository;
 import com.neil.easycron.dao.repository.PluginRepository;
 import com.neil.easycron.exception.BizException;
-import com.neil.easycron.plugin.bo.JobRunningResult;
-import com.neil.easycron.plugin.bo.SingleMessage;
-import com.neil.easycron.plugin.constant.JobRunningStatus;
 import com.neil.easycron.plugin.service.EasyJobService;
 import com.neil.easycron.service.CronJob;
 import com.neil.easycron.service.JobLogService;
@@ -330,7 +327,9 @@ public class JobServiceImpl implements JobService {
         }
         jobRepository.save(job);
         saveConfigFile(file, configMap);
-        restartJob(jobId);
+        if (JobStatus.RUNNING.name().equals(job.getStatus().getCode())) {
+            restartJob(jobId);
+        }
     }
 
     @Override

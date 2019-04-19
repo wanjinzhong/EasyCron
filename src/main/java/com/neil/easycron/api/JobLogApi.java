@@ -9,6 +9,7 @@ import com.neil.easycron.utils.ResponseHelper;
 import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,5 +34,11 @@ public class JobLogApi {
     @GetMapping("log/{logId}/detail")
     public JsonEntity<JobLogBo> getJobDetails(@PathVariable("logId") Long logId) {
         return ResponseHelper.createInstance(jobLogService.getJobLogDetail(logId));
+    }
+
+    @DeleteMapping("log/job/{jobId}")
+    public JsonEntity cleanLog(@PathVariable("jobId") Integer jobId) {
+        jobLogService.cleanLog(jobId);
+        return ResponseHelper.ofNothing();
     }
 }

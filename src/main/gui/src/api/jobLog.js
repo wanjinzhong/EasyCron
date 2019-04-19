@@ -14,3 +14,10 @@ export function getJobLogDetails(jobId) {
     method: 'get'
   })
 }
+
+export function cleanLog(jobId) {
+  return request({
+    url: '/log/job/' + jobId,
+    method: 'delete'
+  })
+}

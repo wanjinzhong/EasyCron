@@ -13,4 +13,6 @@ public interface JobLogService {
     void writeJobLog(Integer jobId, Calendar start, Calendar end, JobRunningResult runningResult, Integer userId);
 
     JobLogBo getJobLogDetail(Long logId);
+
+    void cleanLog(Integer jobId);
 }

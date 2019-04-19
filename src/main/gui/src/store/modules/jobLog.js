@@ -1,4 +1,4 @@
-import { getJobLogs, getJobLogDetails } from '@/api/jobLog'
+import { getJobLogs, getJobLogDetails, cleanLog } from '@/api/jobLog'
 
 const jobLog = {
   state: {
@@ -22,6 +22,15 @@ const jobLog = {
     getJobLogDetails({ commit }, jobId) {
       return new Promise((resolve, reject) => {
         getJobLogDetails(jobId).then(response => {
+          resolve(response)
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    cleanLog({ commit }, jobId) {
+      return new Promise((resolve, reject) => {
+        cleanLog(jobId).then(response => {
           resolve(response)
         }).catch(error => {
           reject(error)

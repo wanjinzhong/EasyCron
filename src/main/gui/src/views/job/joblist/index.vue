@@ -164,7 +164,7 @@
       title="日志"
       width="70%"
       @closed="closeDeleteDialog">
-      <JobLog v-model="jobIdForLog"/>
+      <JobLog v-model="jobIdForLog" :show="showLog"/>
     </el-dialog>
   </div>
 </template>

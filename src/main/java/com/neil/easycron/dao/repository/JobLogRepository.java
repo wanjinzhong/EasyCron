@@ -7,11 +7,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JobLogRepository extends JpaRepository<JobLog, Long> {
-    Page<JobLog> findByJobIdAndIdGreaterThanOrderByEntryDatetimeAsc(Integer jobId, Long id, Pageable pageable);
+    Page<JobLog> findByJobIdOrderByStartTimeAsc(Integer jobId, Pageable pageable);
 
-    Page<JobLog> findByJobIdOrderByEntryDatetimeAsc(Integer jobId, Pageable pageable);
+    Page<JobLog> findByJobIdOrderByStartTimeDesc(Integer jobId, Pageable pageable);
 
-    Page<JobLog> findByJobIdAndIdIsLessThanOrderByEntryDatetimeDesc(Integer jobId, Long id, Pageable pageable);
-
-    Page<JobLog> findByJobIdOrderByEntryDatetimeDesc(Integer jobId, Pageable pageable);
+    void deleteByJobId(Integer jobId);
 }

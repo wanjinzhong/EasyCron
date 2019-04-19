@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Message, MessageBox, Notification } from 'element-ui'
+import { Message, Notification } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
@@ -42,14 +42,9 @@ service.interceptors.response.use(
       if (res.code === 401 && response.request.responseURL.indexOf('/login') < 0) {
         // 请自行在引入 MessageBox
         // import { Message, MessageBox } from 'element-ui'
-        MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('FedLogOut').then(() => {
-            location.reload() // 为了重新实例化vue-router对象 避免bug
-          })
+
+        store.dispatch('FedLogOut').then(() => {
+          location.reload() // 为了重新实例化vue-router对象 避免bug
         })
       } else {
         Notification.error({ title: '错误', message: res.message, duration: 0 })

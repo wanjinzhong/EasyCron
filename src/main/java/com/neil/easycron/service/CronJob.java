@@ -36,7 +36,7 @@ public class CronJob implements Job {
         EasyJobService easyJobService = JobPluginUtil.getJobService(job.getPlugin());
         Map<String, Object> configs = jobService.getConfigMap(job.getId());
         Calendar start = Calendar.getInstance();
-        JobRunningResult result = easyJobService.serve(configs);
+        JobRunningResult result = easyJobService.call(configs);
         logger.info(context.getJobDetail().getKey().toString() + " is running");
         jobLogService.writeJobLog(job.getId(), start, java.util.Calendar.getInstance(), result, userId);
         job.setRunningCount(job.getRunningCount() + 1);

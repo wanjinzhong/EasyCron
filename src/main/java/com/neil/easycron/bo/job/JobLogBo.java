@@ -1,15 +1,13 @@
 package com.neil.easycron.bo.job;
 public class JobLogBo extends JobLogBasicBo {
 
-    private Double during;
     private String message;
 
     public Double getDuring() {
-        return during;
-    }
-
-    public void setDuring(Double during) {
-        this.during = during;
+        if (getStartTime() != null && getEndTime() != null) {
+            return (getEndTime().getTimeInMillis() - getStartTime().getTimeInMillis()) * 1.0 / 1000;
+        }
+        return 0d;
     }
 
     public String getMessage() {
