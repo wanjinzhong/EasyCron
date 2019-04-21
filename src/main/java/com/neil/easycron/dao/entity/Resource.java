@@ -17,8 +17,8 @@ public class Resource {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "path", length = 512, nullable = false, unique = true)
-    private String path;
+    @Column(name = "file_name", length = 512, nullable = false, unique = true)
+    private String fileName;
 
     @ManyToOne
     @JoinColumn(name = "type", nullable = false)
@@ -32,12 +32,12 @@ public class Resource {
         this.id = id;
     }
 
-    public String getPath() {
-        return path;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public ListBox getType() {

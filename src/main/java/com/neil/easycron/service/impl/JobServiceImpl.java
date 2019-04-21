@@ -45,8 +45,8 @@ import com.neil.easycron.service.CronJob;
 import com.neil.easycron.service.JobLogService;
 import com.neil.easycron.service.JobService;
 import com.neil.easycron.service.UserService;
-import com.neil.easycron.utils.FileUtil;
 import com.neil.easycron.utils.JobPluginUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -141,11 +141,11 @@ public class JobServiceImpl implements JobService {
         ListBox listBox = listBoxRepository.findByCatalogAndCode(ListCatalog.JOB_STATUS, JobStatus.WAITING_CONFIG.name());
         job.setStatus(listBox);
         jobRepository.save(job);
-        File jobHome = new File(Constant.ROOT_PATH + "/jobs/" + job.getId());
+        File jobHome = new File(Constant.ResourcePath.JOBS_FULL + job.getId());
         job.setPosition(jobHome.getAbsolutePath());
         jobRepository.save(job);
         jobHome.mkdirs();
-        File configFile = new File(jobHome.getAbsolutePath() + "/" + configFileName);
+        File configFile = new File(jobHome.getAbsolutePath() + File.pathSeparator + configFileName);
         byte[] buffer;
         try {
             buffer = new byte[inputStream.available()];
@@ -155,9 +155,7 @@ public class JobServiceImpl implements JobService {
             outputStream.close();
             inputStream.close();
         } catch (IOException e) {
-            if (jobHome.exists()) {
-                FileUtil.deleteDir(jobHome);
-            }
+            FileUtils.deleteQuietly(jobHome);
             throw new BizException("读取配置文件失败", e);
         }
     }
@@ -176,7 +174,7 @@ public class JobServiceImpl implements JobService {
         if (job == null) {
             throw new BizException("任务不存在");
         }
-        File configFile = new File(job.getPosition() + "/" + job.getConfigFileName());
+        File configFile = new File(job.getPosition() + File.pathSeparator + job.getConfigFileName());
         if (!configFile.exists()) {
             throw new BizException("任务配置丢失");
         }
@@ -287,7 +285,7 @@ public class JobServiceImpl implements JobService {
         if (job == null) {
             throw new BizException("任务不存在");
         }
-        File file = new File(job.getPosition() + "/" + job.getConfigFileName());
+        File file = new File(job.getPosition() + File.pathSeparator + job.getConfigFileName());
         if (!file.exists()) {
             throw new BizException("任务配置丢失");
         }
@@ -358,12 +356,10 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJob(Integer jobId) {
-        // stop job
-        // delete job log
         stopJob(jobId);
         jobRepository.deleteById(jobId);
-        File jobHome = new File(Constant.ROOT_PATH + "/jobs/" + jobId);
-        if (jobHome.exists() && !FileUtil.deleteDir(jobHome)) {
+        File jobHome = new File(Constant.ResourcePath.JOBS_FULL + jobId);
+        if (jobHome.exists() && !FileUtils.deleteQuietly(jobHome)) {
             throw new BizException("无法删除配置文件");
         }
     }

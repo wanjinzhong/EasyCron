@@ -9,6 +9,7 @@ import com.neil.easycron.bo.user.RegisterResultBo;
 import com.neil.easycron.bo.user.UserInfo;
 import com.neil.easycron.constant.enums.UserStatus;
 import com.neil.easycron.dao.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     User findByEmail(String email);
@@ -25,4 +26,5 @@ public interface UserService {
 
     void updateUserStatus(Integer userId, UserStatus status);
 
+    void uploadAvatar(Integer userId, MultipartFile file);
 }

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/public/api")
@@ -41,6 +42,7 @@ public class UserApi {
     }
 
     @PostMapping("user")
+    @RequiresAuthentication
     @RequiresRoles(value = "USER_MANAGER")
     public JsonEntity<RegisterResultBo> register(@RequestBody RegisterRequestBo registerRequestBo) {
         RegisterResultBo res = userService.regist(registerRequestBo);
@@ -54,16 +56,19 @@ public class UserApi {
     }
 
     @GetMapping("users/userView")
+    @RequiresAuthentication
     public JsonEntity<List<UserInfo>> getUsersAsUserView() {
         return ResponseHelper.createInstance(userService.getUsersAsUserView());
     }
 
     @GetMapping("users/roleView")
+    @RequiresAuthentication
     public JsonEntity<List<RoleInfo>> getUsersAsRoleView() {
         return ResponseHelper.createInstance(userService.getUsersAsRoleView());
     }
 
     @PutMapping("user/{userId}/disable")
+    @RequiresAuthentication
     @RequiresRoles(value = "USER_MANAGER")
     public JsonEntity disableUser(@PathVariable("userId") Integer userId) {
         userService.updateUserStatus(userId, UserStatus.DISABLED);
@@ -71,9 +76,17 @@ public class UserApi {
     }
 
     @PutMapping("user/{userId}/enable")
+    @RequiresAuthentication
     @RequiresRoles(value = "USER_MANAGER")
     public JsonEntity enableUser(@PathVariable("userId") Integer userId) {
         userService.updateUserStatus(userId, UserStatus.NORMAL);
+        return ResponseHelper.ofNothing();
+    }
+
+    @PutMapping("user/{userId}/avatar")
+    @RequiresAuthentication
+    public JsonEntity uploadAvatar(@PathVariable("userId") Integer userId, @RequestBody MultipartFile file) {
+        userService.uploadAvatar(userId, file);
         return ResponseHelper.ofNothing();
     }
 }

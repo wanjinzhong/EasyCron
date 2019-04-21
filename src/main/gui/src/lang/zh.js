@@ -4,6 +4,7 @@ export default {
     job: '任务',
     calc: 'Cron计算器',
     users: '用户管理',
+    personal: '个人中心',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',
