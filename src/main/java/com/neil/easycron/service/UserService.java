@@ -26,5 +26,9 @@ public interface UserService {
 
     void updateUserStatus(Integer userId, UserStatus status);
 
-    void uploadAvatar(Integer userId, MultipartFile file);
+    void updateName(Integer userId, String name);
+
+    void getValCode(Integer userId);
+
+    void logout();
 }

@@ -35,3 +35,18 @@ export function addUser(data) {
     data
   })
 }
+
+export function updateUserName(data) {
+  return request({
+    url: 'user/name',
+    method: 'put',
+    data
+  })
+}
+
+export function getValCode(userId) {
+  return request({
+    url: 'user/' + userId + '/valCode',
+    method: 'get'
+  })
+}

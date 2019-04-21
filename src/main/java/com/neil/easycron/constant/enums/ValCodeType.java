@@ -1,4 +1,4 @@
 package com.neil.easycron.constant.enums;
-public enum ResourceType {
-    PLUGIN
+public enum ValCodeType {
+    PWD_RESET
 }

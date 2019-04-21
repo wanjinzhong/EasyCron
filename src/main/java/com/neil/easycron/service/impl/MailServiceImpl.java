@@ -114,4 +114,14 @@ public class MailServiceImpl implements MailService {
         String from = userProfileService.getNotNullValue(Constant.SYSTEM_ID, ProfileKey.EMAIL_USERNAME);
         return sendEmail(from, email, "用户注册成功", "email_register", dataMap);
     }
+
+    @Override
+    public boolean sendValCodeEmail(String email, String userName, String valCode) {
+        Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("TITLE", "修改密码");
+        dataMap.put("USERNAME", userName);
+        dataMap.put("VAL_CODE", valCode);
+        String from = userProfileService.getNotNullValue(Constant.SYSTEM_ID, ProfileKey.EMAIL_USERNAME);
+        return sendEmail(from, email, "修改密码", "email_valcode", dataMap);
+    }
 }

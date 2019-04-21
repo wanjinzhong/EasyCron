@@ -1,11 +1,6 @@
 <template>
   <div>
     <el-table :data="users" :row-class-name="isRowDisabled">
-      <el-table-column width="100px">
-        <template slot-scope="scope" >
-          <img :src="scope.row.avatar" style="width: 60px; margin-right: 10px; vertical-align: middle">
-        </template>
-      </el-table-column>
       <el-table-column label="用户名">
         <template slot-scope="scope">
           <span style="margin-left: 5px">{{ scope.row.name }}</span>

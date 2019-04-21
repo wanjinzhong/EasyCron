@@ -25,16 +25,49 @@
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar" class="user-avatar">
-          <i class="el-icon-caret-bottom"/>
+          {{ name }}&nbsp;&nbsp;<svg-icon icon-class="down" style="font-size: 15px"/>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>
+          <el-dropdown-item>
+            <el-popover
+              trigger="click"
+              @after-leave="userName = $store.state.user.name">
+              <div>
+                <el-input v-model="userName" size="mini" style="width: 150px"/>
+                <el-button :disabled="userName === ''" size="mini" type="success" @click="updateUserName">确定</el-button>
+              </div>
+              <span slot="reference" style="display:block;">
+                <svg-icon icon-class="people"/>
+                修改用户名</span>
+            </el-popover>
+          </el-dropdown-item>
+          <el-dropdown-item>
+            <span style="display:block;" @click="showChangePwd = true"><svg-icon icon-class="password"/> 修改密码</span>
+          </el-dropdown-item>
+          <el-dropdown-item>
+            <span style="display:block;" @click="logout"><svg-icon icon-class="logout"/> {{ $t('navbar.logOut') }}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <el-dialog :visible.sync="showChangePwd" title="修改密码" width="400px">
+      <el-form v-model="changePwdData" size="small" label-width="70px" inline>
+        <el-form-item label="验证码">
+          <el-input v-model="valCode" style="width: 183px"/>
+          <el-button :disabled="cutDown !== 0" type="small" style="width: 92px" @click="getValCode">{{ getValCodeTip }}</el-button>
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="pwd" style="width: 280px"/>
+        </el-form-item>
+        <el-form-item label="确认密码">
+          <el-input v-model="newPwd" style="width: 280px"/>
+        </el-form-item>
+        <div style="width: 100%; text-align: right">
+          <el-button size="small" type="danger">取消</el-button>
+          <el-button :disabled="passwordChangable" size="small" type="success">确定</el-button>
+        </div>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -62,7 +95,14 @@ export default {
   },
   data() {
     return {
-      avatar: this.$store.state.user.avatar
+      userName: this.$store.state.user.name,
+      changePwdData: {},
+      cutDown: 0,
+      showChangePwd: false,
+      interval: undefined,
+      valCode: '',
+      pwd: '',
+      newPwd: ''
     }
   },
   computed: {
@@ -70,7 +110,20 @@ export default {
       'sidebar',
       'name',
       'device'
-    ])
+    ]),
+    getValCodeTip() {
+      return this.cutDown === 0 ? '获取验证码' : this.cutDown
+    },
+    passwordChangable() {
+      return this.valCode === '' || this.pwd === '' || this.pwd !== this.newPwd
+    }
+  },
+  watch: {
+    cutDown(a) {
+      if (a === 0) {
+        clearInterval(this.interval)
+      }
+    }
   },
   methods: {
     toggleSideBar() {
@@ -79,6 +132,24 @@ export default {
     logout() {
       this.$store.dispatch('LogOut').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
+      })
+    },
+    updateUserName() {
+      const data = {
+        id: this.$store.state.user.id,
+        name: this.userName
+      }
+      this.$store.dispatch('updateUserName', data).then(() => {
+        this.$store.dispatch('GetUserInfo')
+      })
+    },
+    getValCode() {
+      this.cutDown = 5
+      this.interval = setInterval(() => {
+        this.cutDown = this.cutDown - 1
+      }, 1000)
+      this.$store.dispatch('getValCode', this.$store.state.user.id).catch(() => {
+        this.cutDown = 0
       })
     }
   }

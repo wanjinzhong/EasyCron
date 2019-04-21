@@ -1,11 +1,11 @@
 import { loginByEmail, logout, getUserInfo } from '@/api/login'
-import { getUsersAsUserView, getUsersAsRoleView, disableUser, enableUser, addUser } from '@/api/user'
+import { getUsersAsUserView, getUsersAsRoleView, disableUser, enableUser, addUser, updateUserName, getValCode } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import defaultAvatar from '@/assets/default_avatar.png'
 
 const user = {
   state: {
     user: '',
+    id: 0,
     status: '',
     token: getToken(),
     name: '',
@@ -20,14 +20,14 @@ const user = {
     SET_TOKEN: (state, token) => {
       state.token = token
     },
+    SET_ID: (state, id) => {
+      state.id = id
+    },
     SET_STATUS: (state, status) => {
       state.status = status
     },
     SET_NAME: (state, name) => {
       state.name = name
-    },
-    SET_AVATAR: (state, avatar) => {
-      state.avatar = avatar === null ? defaultAvatar : process.env.BASE_API + '/resource/' + avatar
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
@@ -41,17 +41,9 @@ const user = {
       state.roles = roles
     },
     SET_USERS_AS_USER_VIEW: (state, users) => {
-      for (const i in users) {
-        users[i].avatar = users[i].avatar === null ? defaultAvatar : process.env.BASE_API + '/resource/' + users[i].avatar
-      }
       state.usersAsUserView = users
     },
     SET_USERS_AS_ROLE_VIEW: (state, roles) => {
-      for (const i in roles) {
-        for (const j in roles[i].users) {
-          roles[i].users[j].avatar = roles[i].users[j].avatar === null ? defaultAvatar : process.env.BASE_API + '/resource/' + roles[i].users[j].avatar
-        }
-      }
       state.usersAsRoleView = roles
     },
     SET_ADD_USER: (state, user) => {
@@ -83,7 +75,7 @@ const user = {
             reject('Verification failed, please login again.')
           }
           const data = response.data.data
-
+          commit('SET_ID', data.id)
           if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLE_BOS', data.roles)
           } else {
@@ -91,7 +83,6 @@ const user = {
           }
 
           commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -191,6 +182,21 @@ const user = {
     addUser({ commit }, user) {
       return new Promise(resolve => {
         addUser(user).then(res => {
+          resolve(res)
+        })
+      })
+    },
+
+    updateUserName({ commit }, data) {
+      return new Promise(resolve => {
+        updateUserName(data).then(res => {
+          resolve(res)
+        })
+      })
+    },
+    getValCode({ commit }, userId) {
+      return new Promise(resolve => {
+        getValCode(userId).then(res => {
           resolve(res)
         })
       })

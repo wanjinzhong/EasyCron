@@ -1,7 +1,6 @@
 package com.neil.easycron.bo.user;
 public class BasicUserBo {
     private Integer id;
-    private Long avatar;
     private String name;
     private String email;
     private String status;
@@ -13,14 +12,6 @@ public class BasicUserBo {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Long getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(Long avatar) {
-        this.avatar = avatar;
     }
 
     public String getName() {

@@ -46,7 +46,7 @@ public class ResourceServiceImpl implements ResourceService {
             throw new BizException("没有指定资源类型");
         }
         Resource newAvatar = new Resource();
-        ListBox listBox = listBoxRepository.findByCatalogAndCode(ListCatalog.RESOURCE_TYPE, ResourceType.AVATAR.name());
+        ListBox listBox = listBoxRepository.findByCatalogAndCode(ListCatalog.RESOURCE_TYPE, type.name());
         newAvatar.setType(listBox);
         newAvatar.setFileName(fileName);
         return newAvatar;
@@ -55,7 +55,6 @@ public class ResourceServiceImpl implements ResourceService {
     private String getFilePrefix(ResourceType type) {
         String path = null;
         switch (type) {
-            case AVATAR: path = Constant.ResourcePath.AVATAR_FULL; break;
             case PLUGIN: path = Constant.ResourcePath.PLUGIN_FULL; break;
         }
         return path;

@@ -6,7 +6,6 @@
       <el-table-column label="用户">
         <template slot-scope="scope">
           <el-tag v-for="user in scope.row.users" :key="user.id" :closable="scope.row.userDeletable" style="margin: 5px" @close="removeRole(user.name, scope.row.name, user.id, scope.row.id)">
-            <img :src="user.avatar" style="width: 20px; vertical-align: middle; margin-right: 5px">
             <span>{{ user.name }}</span>
           </el-tag>
           <el-popover

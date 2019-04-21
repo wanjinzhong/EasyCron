@@ -56,7 +56,6 @@ public class DataInitialServiceImpl implements DataInitialService {
             } else {
                 exists.setName(user.getName());
                 exists.setEmail(user.getEmail());
-                exists.setAvatar(user.getAvatar());
                 userRepository.save(exists);
             }
         }

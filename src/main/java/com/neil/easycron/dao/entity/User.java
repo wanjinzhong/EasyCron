@@ -32,10 +32,6 @@ public class User implements Serializable {
     @Column(name = "email", length = 100, nullable = false)
     private String email;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "avatar")
-    private Resource avatar;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_role",
                joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
@@ -74,14 +70,6 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Resource getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(Resource avatar) {
-        this.avatar = avatar;
     }
 
     public List<Role> getRoles() {

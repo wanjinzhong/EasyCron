@@ -1,7 +1,6 @@
 package com.neil.easycron.service.impl;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -9,6 +8,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import com.neil.easycron.ValCodeCache;
+import com.neil.easycron.bo.ValCodeBo;
 import com.neil.easycron.bo.role.BasicRoleBo;
 import com.neil.easycron.bo.role.RoleInfo;
 import com.neil.easycron.bo.user.BasicUserBo;
@@ -19,35 +20,29 @@ import com.neil.easycron.bo.user.UserInfo;
 import com.neil.easycron.config.EasyCronToken;
 import com.neil.easycron.constant.Constant;
 import com.neil.easycron.constant.enums.ListCatalog;
-import com.neil.easycron.constant.enums.ResourceType;
 import com.neil.easycron.constant.enums.RoleCode;
 import com.neil.easycron.constant.enums.UserStatus;
+import com.neil.easycron.constant.enums.ValCodeType;
 import com.neil.easycron.dao.entity.ListBox;
-import com.neil.easycron.dao.entity.Resource;
 import com.neil.easycron.dao.entity.Role;
 import com.neil.easycron.dao.entity.User;
 import com.neil.easycron.dao.repository.ListBoxRepository;
-import com.neil.easycron.dao.repository.ResourceRepository;
 import com.neil.easycron.dao.repository.RoleRepository;
 import com.neil.easycron.dao.repository.UserRepository;
 import com.neil.easycron.exception.BizException;
 import com.neil.easycron.service.MailService;
-import com.neil.easycron.service.ResourceService;
 import com.neil.easycron.service.UserService;
 import com.neil.easycron.utils.UuidUtil;
 import com.neil.easycron.utils.ValidatorUtil;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.crypto.hash.SimpleHash;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -64,14 +59,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private MailService mailService;
-
-    @Autowired
-    private ResourceService resourceService;
-
-    @Autowired
-    private ResourceRepository resourceRepository;
-
-    private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     public User findByEmail(String email) {
@@ -144,7 +131,6 @@ public class UserServiceImpl implements UserService {
         userInfo.setId(user.getId());
         userInfo.setName(user.getName());
         userInfo.setEmail(user.getEmail());
-        userInfo.setAvatar(user.getAvatar() == null ? null : user.getAvatar().getId());
         userInfo.setStatus(user.getStatus().getDisplayName());
         userInfo.setStatusCode(user.getStatus().getCode());
 
@@ -201,7 +187,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void uploadAvatar(Integer userId, MultipartFile file) {
+    public void updateName(Integer userId, String name) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             throw new BizException("用户不存在");
@@ -213,32 +199,31 @@ public class UserServiceImpl implements UserService {
         if (!user.getId().equals(userInfo.getId())) {
             throw new UnauthorizedException();
         }
-        if (!file.getContentType().startsWith("image/")) {
-            throw new BizException("只支持图片");
-        }
-        Resource originalAvatar = user.getAvatar();
-        String originFileName = file.getOriginalFilename();
-        String suffix = originFileName.substring(originFileName.lastIndexOf(".") + 1);
-        String fileName = UuidUtil.getUuid();
-        if (StringUtils.isNotBlank(suffix)) {
-            fileName = fileName + "." + suffix;
-        }
-        Resource resource = resourceService.buildResource(ResourceType.AVATAR, fileName);
-        String path = resourceService.getFilePath(ResourceType.AVATAR, fileName);
-        try {
-            FileUtils.writeByteArrayToFile(new File(path), file.getBytes());
-        } catch (IOException e) {
-            throw new BizException("无法读取文件", e);
-        }
-        user.setAvatar(resource);
+        user.setName(name);
         userRepository.save(user);
-        File toBeDelete = new File(Constant.ResourcePath.ROOT_PATH + originalAvatar.getFileName());
-        try {
-            FileUtils.forceDelete(toBeDelete);
-        } catch (IOException e) {
-            logger.error("删除文件失败", e);
+    }
+
+    @Override
+    public void getValCode(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new BizException("用户不存在");
         }
-        resourceRepository.delete(originalAvatar);
+        String code = UuidUtil.getUuid().substring(0, 8);
+        ValCodeBo valCodeBo = new ValCodeBo();
+        valCodeBo.setCode(code);
+        valCodeBo.setStartTime(Calendar.getInstance().getTimeInMillis());
+        Calendar expireTime = Calendar.getInstance();
+        expireTime.add(Calendar.MINUTE, 30);
+        valCodeBo.setExpireTime(expireTime.getTimeInMillis());
+        valCodeBo.setType(ValCodeType.PWD_RESET);
+        ValCodeCache.put(valCodeBo);
+        mailService.sendValCodeEmail(user.getEmail(), user.getName(), code);
+    }
+
+    @Override
+    public void logout() {
+        SecurityUtils.getSubject().logout();
     }
 
     private RoleInfo toRoleInfo(Role role) {
@@ -251,7 +236,6 @@ public class UserServiceImpl implements UserService {
         roleInfo.setUsers(role.getUsers().stream().map(u -> {
             BasicUserBo user = new BasicUserBo();
             user.setId(u.getId());
-            user.setAvatar(u.getAvatar() == null ? null : u.getAvatar().getId());
             user.setEmail(u.getEmail());
             user.setName(u.getName());
             user.setStatus(u.getStatus().getDisplayName());
