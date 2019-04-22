@@ -5,6 +5,7 @@ import java.util.UUID;
 import com.neil.easycron.bo.response.JsonEntity;
 import com.neil.easycron.bo.role.RoleInfo;
 import com.neil.easycron.bo.user.BasicUserBo;
+import com.neil.easycron.bo.user.ChangePwdBo;
 import com.neil.easycron.bo.user.LoginRequestBo;
 import com.neil.easycron.bo.user.LoginResultBo;
 import com.neil.easycron.bo.user.RegisterRequestBo;
@@ -93,15 +94,22 @@ public class UserApi {
 
     @PutMapping("user/name")
     @RequiresAuthentication
-    public JsonEntity uploadAvatar(@RequestBody BasicUserBo userBo) {
-        userService.updateName(userBo.getId(), userBo.getName());
+    public JsonEntity changeName(@RequestBody BasicUserBo userBo) {
+        userService.updateName(userBo.getName());
         return ResponseHelper.ofNothing();
     }
 
-    @GetMapping("user/{userId}/valCode")
+    @GetMapping("user/valCode")
     @RequiresAuthentication
-    public JsonEntity getValCode(@PathVariable("userId") Integer userId) {
-        userService.getValCode(userId);
+    public JsonEntity getValCode() {
+        userService.getValCode();
+        return ResponseHelper.ofNothing();
+    }
+
+    @PutMapping("user/password")
+    @RequiresAuthentication
+    public JsonEntity changePassword(@RequestBody ChangePwdBo changePwdBo) {
+        userService.changePwd(changePwdBo);
         return ResponseHelper.ofNothing();
     }
 }

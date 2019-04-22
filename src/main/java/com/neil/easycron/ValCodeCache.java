@@ -1,4 +1,5 @@
 package com.neil.easycron;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,11 +13,14 @@ public class ValCodeCache {
         valCodes.add(valCode);
     }
 
-    public static ValCodeBo pop(Integer userId, ValCodeType type, String codeStr) {
+    public static void remove(ValCodeBo code) {
+        valCodes.remove(code);
+    }
+
+    public static ValCodeBo get(Integer userId, ValCodeType type) {
         ValCodeBo need = new ValCodeBo();
         need.setUserId(userId);
         need.setType(type);
-        need.setCode(codeStr);
         ValCodeBo res = null;
         for (ValCodeBo code : valCodes) {
             if (code.equals(need)) {
@@ -24,7 +28,10 @@ public class ValCodeCache {
                 break;
             }
         }
-        valCodes.remove(res);
         return res;
+    }
+
+    public static boolean isValCodeExpired(ValCodeBo code) {
+        return code == null || code.getExpireTime() < Calendar.getInstance().getTimeInMillis();
     }
 }

@@ -13,6 +13,7 @@ import com.neil.easycron.bo.ValCodeBo;
 import com.neil.easycron.bo.role.BasicRoleBo;
 import com.neil.easycron.bo.role.RoleInfo;
 import com.neil.easycron.bo.user.BasicUserBo;
+import com.neil.easycron.bo.user.ChangePwdBo;
 import com.neil.easycron.bo.user.LoginRequestBo;
 import com.neil.easycron.bo.user.RegisterRequestBo;
 import com.neil.easycron.bo.user.RegisterResultBo;
@@ -40,7 +41,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.crypto.hash.SimpleHash;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -187,8 +187,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateName(Integer userId, String name) {
-        User user = userRepository.findById(userId).orElse(null);
+    public void updateName(String name) {
+        User user = userRepository.findById(getUserInfo().getId()).orElse(null);
         if (user == null) {
             throw new BizException("用户不存在");
         }
@@ -204,14 +204,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void getValCode(Integer userId) {
-        User user = userRepository.findById(userId).orElse(null);
+    public void getValCode() {
+        User user = userRepository.findById(getUserInfo().getId()).orElse(null);
         if (user == null) {
             throw new BizException("用户不存在");
         }
         String code = UuidUtil.getUuid().substring(0, 8);
         ValCodeBo valCodeBo = new ValCodeBo();
+        valCodeBo.setUserId(user.getId());
         valCodeBo.setCode(code);
+        System.out.println(code);
         valCodeBo.setStartTime(Calendar.getInstance().getTimeInMillis());
         Calendar expireTime = Calendar.getInstance();
         expireTime.add(Calendar.MINUTE, 30);
@@ -224,6 +226,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public void logout() {
         SecurityUtils.getSubject().logout();
+    }
+
+    @Override
+    public void changePwd(ChangePwdBo changePwdBo) {
+        if (changePwdBo.getPwd().length() < 6) {
+            throw new BizException("密码不能小于6位");
+        }
+        Integer userId = getUserInfo().getId();
+        ValCodeBo valCodeBo = ValCodeCache.get(userId, ValCodeType.PWD_RESET);
+        if (valCodeBo == null) {
+            throw new BizException("请先获取验证码");
+        }
+        if (ValCodeCache.isValCodeExpired(valCodeBo)) {
+            ValCodeCache.remove(valCodeBo);
+            throw new BizException("验证码已过期，请重新获取验证码");
+        }
+        if (!valCodeBo.getCode().equalsIgnoreCase(changePwdBo.getValCode())) {
+            throw new BizException("验证码不正确");
+        }
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new BizException("用户不存在");
+        }
+        String salt = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10);
+        String securityPwd = new SimpleHash("MD5", changePwdBo.getPwd(), salt, Constant.HASH_ITERATIONS).toHex();
+        user.setSalt(salt);
+        user.setPassword(securityPwd);
+        userRepository.save(user);
+        ValCodeCache.remove(valCodeBo);
     }
 
     private RoleInfo toRoleInfo(Role role) {

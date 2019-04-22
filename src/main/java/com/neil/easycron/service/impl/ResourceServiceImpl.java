@@ -56,6 +56,7 @@ public class ResourceServiceImpl implements ResourceService {
         String path = null;
         switch (type) {
             case PLUGIN: path = Constant.ResourcePath.PLUGIN_FULL; break;
+            case PLUGIN_IMG: path = Constant.ResourcePath.PLUGIN_IMG_FULL; break;
         }
         return path;
     }

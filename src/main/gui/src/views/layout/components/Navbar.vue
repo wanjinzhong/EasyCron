@@ -57,14 +57,14 @@
           <el-button :disabled="cutDown !== 0" type="small" style="width: 92px" @click="getValCode">{{ getValCodeTip }}</el-button>
         </el-form-item>
         <el-form-item label="新密码">
-          <el-input v-model="pwd" style="width: 280px"/>
+          <el-input v-model="pwd" style="width: 280px" type="password"/>
         </el-form-item>
         <el-form-item label="确认密码">
-          <el-input v-model="newPwd" style="width: 280px"/>
+          <el-input v-model="newPwd" style="width: 280px" type="password"/>
         </el-form-item>
         <div style="width: 100%; text-align: right">
           <el-button size="small" type="danger">取消</el-button>
-          <el-button :disabled="passwordChangable" size="small" type="success">确定</el-button>
+          <el-button :disabled="passwordChangable" size="small" type="success" @click="changePwd">确定</el-button>
         </div>
       </el-form>
     </el-dialog>
@@ -102,7 +102,8 @@ export default {
       interval: undefined,
       valCode: '',
       pwd: '',
-      newPwd: ''
+      newPwd: '',
+      changePwdLoading: false
     }
   },
   computed: {
@@ -136,7 +137,6 @@ export default {
     },
     updateUserName() {
       const data = {
-        id: this.$store.state.user.id,
         name: this.userName
       }
       this.$store.dispatch('updateUserName', data).then(() => {
@@ -144,12 +144,26 @@ export default {
       })
     },
     getValCode() {
-      this.cutDown = 5
+      this.cutDown = 60
       this.interval = setInterval(() => {
         this.cutDown = this.cutDown - 1
       }, 1000)
-      this.$store.dispatch('getValCode', this.$store.state.user.id).catch(() => {
+      this.$store.dispatch('getValCode').catch(() => {
         this.cutDown = 0
+      })
+    },
+    changePwd() {
+      const data = {
+        valCode: this.valCode,
+        pwd: this.pwd
+      }
+      this.changePwdLoading = true
+      this.$store.dispatch('changePwd', data).then(() => {
+        this.$message.success('修改密码成功')
+        this.changePwdLoading = false
+        this.showChangePwd = false
+      }).catch(reason => {
+        this.changePwdLoading = false
       })
     }
   }

@@ -60,12 +60,11 @@ public class ValCodeBo {
         }
         ValCodeBo valCodeBo = (ValCodeBo) o;
         return userId.equals(valCodeBo.userId) &&
-               type == valCodeBo.type &&
-               code.equals(valCodeBo.code);
+               type == valCodeBo.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, type, code);
+        return Objects.hash(userId, type);
     }
 }

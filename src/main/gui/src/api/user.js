@@ -44,9 +44,17 @@ export function updateUserName(data) {
   })
 }
 
-export function getValCode(userId) {
+export function getValCode() {
   return request({
-    url: 'user/' + userId + '/valCode',
+    url: 'user/valCode',
     method: 'get'
+  })
+}
+
+export function changePwd(data) {
+  return request({
+    url: 'user/password',
+    method: 'put',
+    data
   })
 }

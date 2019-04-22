@@ -1,5 +1,5 @@
 import { loginByEmail, logout, getUserInfo } from '@/api/login'
-import { getUsersAsUserView, getUsersAsRoleView, disableUser, enableUser, addUser, updateUserName, getValCode } from '@/api/user'
+import { getUsersAsUserView, getUsersAsRoleView, disableUser, enableUser, addUser, updateUserName, getValCode, changePwd } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -194,9 +194,17 @@ const user = {
         })
       })
     },
-    getValCode({ commit }, userId) {
+    getValCode({ commit }) {
       return new Promise(resolve => {
-        getValCode(userId).then(res => {
+        getValCode().then(res => {
+          resolve(res)
+        })
+      })
+    },
+    changePwd({ commit }, data) {
+      console.log(data)
+      return new Promise(resolve => {
+        changePwd(data).then(res => {
           resolve(res)
         })
       })

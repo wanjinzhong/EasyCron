@@ -53,16 +53,16 @@
         </Data>
         <Data>
             <Field name="catalog">RESOURCE_TYPE</Field>
-            <Field name="code">AVATAR</Field>
+            <Field name="code">PLUGIN</Field>
             <Field name="detail"></Field>
-            <Field name="displayName">头像</Field>
+            <Field name="displayName">插件</Field>
             <Field name="seq">1</Field>
         </Data>
         <Data>
             <Field name="catalog">RESOURCE_TYPE</Field>
-            <Field name="code">PLUGIN</Field>
+            <Field name="code">PLUGIN_IMG</Field>
             <Field name="detail"></Field>
-            <Field name="displayName">插件</Field>
+            <Field name="displayName">插件图标</Field>
             <Field name="seq">2</Field>
         </Data>
         <Data>
