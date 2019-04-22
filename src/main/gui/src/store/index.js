@@ -10,6 +10,7 @@ import listbox from './modules/listbox'
 import plugin from './modules/plugin'
 import role from './modules/role'
 import jobLog from './modules/jobLog'
+import setting from './modules/setting'
 import getters from './getters'
 
 Vue.use(Vuex)
@@ -25,7 +26,8 @@ const store = new Vuex.Store({
     listbox,
     plugin,
     role,
-    jobLog
+    jobLog,
+    setting
   },
   getters
 })

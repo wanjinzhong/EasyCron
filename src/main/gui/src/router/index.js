@@ -153,6 +153,19 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/setting',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/setting/index'),
+        name: 'Setting',
+        meta: { title: 'setting', icon: 'setting', /* affix: true,*/
+          roles: ['SYSTEM_MANAGER'] }
+      }
+    ]
+  },
+  {
     path: '/permission',
     component: Layout,
     redirect: '/permission/index',
